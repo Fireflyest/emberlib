@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,15 +27,25 @@ import io.fireflyest.spigot.emberlib.cache.api.StringOrganism;
 public class CacheOrganism implements StringOrganism {
 
     private final String name;
+    private final Map<String, CacheCell> cacheMap;
     private final Random random = new Random();
-    protected final Map<String, CacheCell> cacheMap = new ConcurrentHashMap<>();
+
+    /**
+     * 数据组织构造函数，使用普通的HashMap
+     * @param name 作为保存时的文件名称
+     */
+    public CacheOrganism(String name) {
+        this(name, false);
+    }
 
     /**
      * 数据组织构造函数
      * @param name 作为保存时的文件名称
+     * @param concurrent 是否使用线程安全的Map
      */
-    public CacheOrganism(String name) {
+    public CacheOrganism(String name, boolean concurrent) {
         this.name = name;
+        this.cacheMap = concurrent ? new ConcurrentHashMap<>() : new HashMap<>();
     }
 
     @Override
