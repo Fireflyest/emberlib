@@ -179,16 +179,13 @@ public class CacheOrganism implements StringOrganism {
     }
 
     /**
-     * 保存格式为
-     * key(String) born(long) deadline(long) count(int) [obj(String)]
+     * 保存缓存到文件
+     * @param file 缓存文件
      */
-    @Override
-    public void save(@Nonnull Plugin plugin) {
-        final String fileName = String.format("%s.cache", name);
-        final File cacheFile = new File(plugin.getDataFolder(), fileName);
-        try (FileOutputStream fStream = new FileOutputStream(cacheFile);
+    public void save(@Nonnull File file) {
+        try (FileOutputStream fStream = new FileOutputStream(file);
                 DataOutputStream dStream = new DataOutputStream(fStream)) {
-            
+            // 缓存迭代器
             final Iterator<Entry<String, CacheCell>> iterator = cacheMap.entrySet().iterator(); 
             // 拼接数据   
             while (iterator.hasNext()) {
@@ -217,13 +214,26 @@ public class CacheOrganism implements StringOrganism {
         }
     }
 
+    /**
+     * 保存格式为
+     * key(String) born(long) deadline(long) count(int) [obj(String)]
+     */
     @Override
-    public void load(@Nonnull Plugin plugin) {
+    public void save(@Nonnull Plugin plugin) {
         final String fileName = String.format("%s.cache", name);
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
-        try (FileInputStream fStream = new FileInputStream(cacheFile);
+        this.save(cacheFile);
+        
+    }
+
+    /**
+     * 从文件加载数据到缓存
+     * @param file 缓存文件
+     */
+    public void load(@Nonnull File file) {
+        try (FileInputStream fStream = new FileInputStream(file);
                 DataInputStream dStream = new DataInputStream(fStream)) {
-            
+            // 读取整个文件
             while (dStream.available() > 0) {
                 final String key = dStream.readUTF();
                 final Instant born = Instant.ofEpochMilli(dStream.readLong());
@@ -234,11 +244,20 @@ public class CacheOrganism implements StringOrganism {
                 for (int i = 0; i < count; i++) {
                     valueSet.add(dStream.readUTF());
                 }
-                cacheMap.put(key, new CacheCell(born, deadline, valueSet));
+                if (deadline == null || Instant.now().isBefore(deadline)) {
+                    cacheMap.put(key, new CacheCell(born, deadline, valueSet));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }    
+        }
+    }
+
+    @Override
+    public void load(@Nonnull Plugin plugin) {
+        final String fileName = String.format("%s.cache", name);
+        final File cacheFile = new File(plugin.getDataFolder(), fileName);
+        this.load(cacheFile);
     }
 
     @Override
