@@ -220,7 +220,7 @@ public class CacheOrganism implements StringOrganism {
      */
     @Override
     public void save(@Nonnull Plugin plugin) {
-        final String fileName = String.format("%s.cache", name);
+        final String fileName = name + ".cache";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
         this.save(cacheFile);
         
@@ -255,7 +255,7 @@ public class CacheOrganism implements StringOrganism {
 
     @Override
     public void load(@Nonnull Plugin plugin) {
-        final String fileName = String.format("%s.cache", name);
+        final String fileName = name + ".cache";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
         this.load(cacheFile);
     }
