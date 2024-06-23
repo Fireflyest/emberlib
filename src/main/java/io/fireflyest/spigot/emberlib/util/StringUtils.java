@@ -9,7 +9,9 @@ import java.util.regex.Pattern;
  */
 public final class StringUtils {
     
-    public static final Pattern PERCENT_PATTERN = Pattern.compile("%([^%]*)%"); // %value%
+    public static final Pattern PERCENT_PATTERN = Pattern.compile("%([^%]*)%"); // 百分号
+    public static final Pattern BRACE_PATTERN = Pattern.compile("\\$\\{([^{}]*)}"); // 美元大括号
+    public static final Pattern FORMAT_PATTERN = Pattern.compile("\\{([^{}]*)}"); // 大括号
 
     private StringUtils() {
         // 
