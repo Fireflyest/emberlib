@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import org.bukkit.plugin.Plugin;
-import io.fireflyest.spigot.emberlib.cache.api.StringOrganism;
+import io.fireflyest.spigot.emberlib.cache.api.Organism;
 
 /**
  * 数据缓存组织实现类
@@ -24,7 +24,7 @@ import io.fireflyest.spigot.emberlib.cache.api.StringOrganism;
  * @author Fireflyest
  * @since 1.0
  */
-public class CacheOrganism implements StringOrganism {
+public class CacheOrganism implements Organism<String, String> {
 
     private final String name;
     private final Map<String, CacheCell> cacheMap;
@@ -258,17 +258,6 @@ public class CacheOrganism implements StringOrganism {
         final String fileName = name + ".cache";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
         this.load(cacheFile);
-    }
-
-    @Override
-    public void append(@Nonnull String key, String substring) {
-        final CacheCell cell = cacheMap.get(key);
-        // 存在则拼接，否则添加新数据
-        if (cell != null && cell.get() != null) {
-            cell.append(substring);
-        } else {
-            this.set(key, substring);
-        }
     }
 
 }
