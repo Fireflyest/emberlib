@@ -103,21 +103,21 @@ public final class StringUtils {
     /**
      * 变量替换
      * @param pattern 正则表达式的编译表示
-     * @param text 需要变量替换的文本
+     * @param str 需要变量替换的文本
      * @param begin 变量前方包裹符号的数量
      * @param end 变量后方包裹符号的数量
      * @param container 存储变量的容器
      * @return 替换后的文本
      */
     public static String varReplace(@Nonnull Pattern pattern, 
-                                    @Nullable String text, 
+                                    @Nullable String str, 
                                     int begin, 
                                     int end, 
                                     @Nonnull VariableContainer container) {
-        if (text == null) {
-            return null;
+        if (str == null || str.isEmpty()) {
+            return str;
         }
-        final Matcher varMatcher = pattern.matcher(text);
+        final Matcher varMatcher = pattern.matcher(str);
         final StringBuilder stringBuilder = new StringBuilder();
         while (varMatcher.find()) {
             final String parameter = varMatcher.group();
@@ -135,8 +135,8 @@ public final class StringUtils {
      * @return 文本
      */
     public static String format(@Nullable String text, Object... vars) {
-        if (text == null) {
-            return null;
+        if (text == null || text.isEmpty()) {
+            return text;
         }
         return varReplace(FORMAT_PATTERN, text, 1, 1, new VariableContainer() {
 
@@ -145,12 +145,14 @@ public final class StringUtils {
             @Override
             public String getVar(String key) {
                 // 有序号用序号，没有序号按顺序给
-                index = "".equals(key) ? index++ : NumberConversions.toInt(key);
+                if (!"".equals(key)) {
+                    index = NumberConversions.toInt(key);
+                }
                 // 判断是否越界
                 if (index >= vars.length) {
                     index = vars.length - 1;
                 }
-                return String.valueOf(vars[index]);
+                return String.valueOf(vars[index++]);
             }
 
         });
@@ -172,7 +174,7 @@ public final class StringUtils {
      * @return 列表
      */
     public static <T> List<T> jsonToList(@Nullable String str) {
-        if (str == null) {
+        if (str == null || str.isEmpty()) {
             return Collections.emptyList();
         }
         return gson.fromJson(str, new TypeToken<List<T>>() {}.getType());
@@ -208,8 +210,8 @@ public final class StringUtils {
      * @return 首字母大写
      */
     public static String upperFirst(@Nullable String str) {
-        if (str == null) {
-            return null;
+        if (str == null || str.isEmpty()) {
+            return str;
         }
         return Character.toUpperCase(str.charAt(0)) + str.substring(1).toLowerCase();
     }
@@ -220,9 +222,9 @@ public final class StringUtils {
      * @param formType 原格式
      * @return 句子格式文本
      */
-    public static String toSentence(@Nullable String str, String formType) {
-        if (str == null) {
-            return null;
+    public static String toSentence(@Nullable String str, @Nonnull String formType) {
+        if (str == null || str.isEmpty()) {
+            return str;
         }
         switch (formType) {
             case CAMEL:
@@ -238,8 +240,13 @@ public final class StringUtils {
                 // 其他用符号分割的
                 final Matcher wordMatcher = SPLIT_WORDS.matcher(str);
                 final StringBuilder stringBuilder = new StringBuilder();
+                boolean first = true;
                 while (wordMatcher.find()) {
-                    stringBuilder.append(wordMatcher.group().toLowerCase()).append(" ");
+                    if (!first) {
+                        stringBuilder.append(" ");
+                    }
+                    stringBuilder.append(wordMatcher.group().toLowerCase());
+                    first = false;
                 }
                 return stringBuilder.toString();
         }
@@ -251,12 +258,15 @@ public final class StringUtils {
      * @return 句子格式文本
      */
     public static String toSentence(@Nullable String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
         // 驼峰是纯文本
         if (PURE_TEXT.matcher(str).matches()) {
             return toSentence(str, CAMEL);
         }
         // 其他用符号分割
-        return toSentence(str, null);
+        return toSentence(str, "");
     }
 
 }
