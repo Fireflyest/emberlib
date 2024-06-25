@@ -54,8 +54,8 @@ public class CacheCell implements Cell<String> {
     @Nullable
     public String get() {
         // 无限期或者在期限内返回数据
-        if (deadline == null || Instant.now().isBefore(deadline)) {
-            return valueSet.size() == 1 ? valueSet.toArray(new String[0])[0] : valueSet.toString();
+        if (!valueSet.isEmpty() && (deadline == null || Instant.now().isBefore(deadline))) {
+            return valueSet.toArray(new String[0])[0];
         }
         return null;
     }
