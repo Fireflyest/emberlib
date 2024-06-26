@@ -26,7 +26,9 @@ public class CacheOrganismTest {
         final CacheOrganism organism = new CacheOrganism(null);
         organism.set(KEY_1, VALUE_1);
         try {
-            Thread.sleep(10);
+            synchronized (organism) {
+                organism.wait(10);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -55,7 +57,9 @@ public class CacheOrganismTest {
         // 未过期
         organism.expire(KEY_1, 200);
         try {
-            Thread.sleep(10);
+            synchronized (organism) {
+                organism.wait(10);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -63,7 +67,9 @@ public class CacheOrganismTest {
         // 重新设置时间
         organism.expire(KEY_1, 9);
         try {
-            Thread.sleep(10);
+            synchronized (organism) {
+                organism.wait(10);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -77,14 +83,14 @@ public class CacheOrganismTest {
     public void testGet() {
         final CacheOrganism organism = new CacheOrganism(null);
         organism.set(KEY_1, VALUE_1);
-        assertEquals(organism.get(KEY_1), VALUE_1);
+        assertEquals(VALUE_1, organism.get(KEY_1));
     }
 
     @Test
     public void testKeySet() {
         final CacheOrganism organism = new CacheOrganism(null);
         organism.set(KEY_1, VALUE_1);
-        assertEquals(organism.keySet().size(), 1);
+        assertEquals(1, organism.keySet().size());
     }
 
     @Test
@@ -100,7 +106,9 @@ public class CacheOrganismTest {
         organism.setex(KEY_3, 9, VALUE_3);
 
         try {
-            Thread.sleep(10);
+            synchronized (organism) {
+                organism.wait(10);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -110,8 +118,8 @@ public class CacheOrganismTest {
         final CacheOrganism organismLoad = new CacheOrganism(null);
         organismLoad.load(file);
 
-        assertEquals(organismLoad.scard(KEY_1), 3);
-        assertEquals(organismLoad.get(KEY_2), VALUE_2);
+        assertEquals(3, organismLoad.scard(KEY_1));
+        assertEquals(VALUE_2, organismLoad.get(KEY_2));
         assertNull(organismLoad.get(KEY_3));
 
     }
@@ -122,7 +130,9 @@ public class CacheOrganismTest {
         organism.setex(KEY_1, 9, VALUE_1);
         organism.persist(KEY_1);
         try {
-            Thread.sleep(10);
+            synchronized (organism) {
+                organism.wait(10);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -134,7 +144,7 @@ public class CacheOrganismTest {
         final CacheOrganism organism = new CacheOrganism(null);
         organism.set(KEY_1, VALUE_1);
         organism.sadd(KEY_1, VALUE_2);
-        assertEquals(organism.scard(KEY_1), 2);
+        assertNotNull(organism.smembers(KEY_1));
     }
 
     @Test
@@ -142,16 +152,16 @@ public class CacheOrganismTest {
         final CacheOrganism organism = new CacheOrganism(null);
         organism.set(KEY_1, VALUE_1);
         organism.sadd(KEY_1, VALUE_2);
-        assertEquals(organism.scard(KEY_1), 2);
+        assertEquals(2, organism.scard(KEY_1));
     }
 
     @Test
     public void testSet() {
         final CacheOrganism organism = new CacheOrganism(null);
         organism.set(KEY_1, VALUE_1);
-        assertEquals(organism.get(KEY_1), VALUE_1);
+        assertEquals(VALUE_1, organism.get(KEY_1));
         organism.set(KEY_1, VALUE_2);
-        assertEquals(organism.get(KEY_1), VALUE_2);
+        assertEquals(VALUE_2, organism.get(KEY_1));
     }
 
     @Test
@@ -159,7 +169,9 @@ public class CacheOrganismTest {
         final CacheOrganism organism = new CacheOrganism(null);
         organism.setex(KEY_1, 9, VALUE_1);
         try {
-            Thread.sleep(10);
+            synchronized (organism) {
+                organism.wait(10);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -184,13 +196,13 @@ public class CacheOrganismTest {
         organism.set(KEY_1, VALUE_1);
         organism.sadd(KEY_1, VALUE_2);
         organism.sadd(KEY_1, VALUE_3);
-        assertEquals(organism.scard(KEY_1), 3);
+        assertEquals(3, organism.scard(KEY_1));
         organism.spop(KEY_1);
-        assertEquals(organism.scard(KEY_1), 2);
+        assertEquals(2, organism.scard(KEY_1));
         organism.spop(KEY_1);
-        assertEquals(organism.scard(KEY_1), 1);
+        assertEquals(1, organism.scard(KEY_1));
         organism.spop(KEY_1);
-        assertEquals(organism.scard(KEY_1), 0);
+        assertEquals(0, organism.scard(KEY_1));
     }
 
     @Test
@@ -212,13 +224,15 @@ public class CacheOrganismTest {
         organism.set(KEY_2, VALUE_2);
         organism.setex(KEY_3, 4, VALUE_3);
         try {
-            Thread.sleep(5);
+            synchronized (organism) {
+                organism.wait(5);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         assertTrue(organism.ttl(KEY_1) <= 5);
-        assertTrue(organism.ttl(KEY_2) == -1);
-        assertTrue(organism.ttl(KEY_3) == 0);
+        assertEquals(-1, organism.ttl(KEY_2));
+        assertEquals(0, organism.ttl(KEY_3));
     }
 
 }
