@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.bukkit.plugin.Plugin;
 import io.fireflyest.spigot.emberlib.cache.api.Organism;
 
@@ -105,13 +106,19 @@ public class CacheOrganism implements Organism<String, String> {
     }
 
     @Override
+    @Nullable
     public String get(@Nonnull String key) {
         return cacheMap.containsKey(key) ? cacheMap.get(key).get() : null;
     }
 
     @Override
     public long age(@Nonnull String key) {
-        return cacheMap.containsKey(key) ? cacheMap.get(key).age() : 0;
+        final CacheCell cell = cacheMap.get(key);
+        long age = 0;
+        if (cell != null && cell.get() != null) {
+            age = cell.age();
+        }
+        return age;
     }
 
     @Override
@@ -126,6 +133,7 @@ public class CacheOrganism implements Organism<String, String> {
     }
 
     @Override
+    @Nullable
     public Set<String> smembers(@Nonnull String key) {
         return cacheMap.containsKey(key) ? cacheMap.get(key).getAll() : null;
     }
@@ -140,6 +148,7 @@ public class CacheOrganism implements Organism<String, String> {
     }
 
     @Override
+    @Nullable
     public String spop(@Nonnull String key) {
         final CacheCell cell = cacheMap.get(key);
         Set<String> valueSet = null;
