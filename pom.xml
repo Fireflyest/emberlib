@@ -6,8 +6,8 @@
   <artifactId>emberlib</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>emberlib</name>
-  <url>http://www.example.com</url>
+  <name>EmberLib</name>
+  <url>https://github.com/Fireflyest/emberlib</url>
 
   <build>
     <resources>
