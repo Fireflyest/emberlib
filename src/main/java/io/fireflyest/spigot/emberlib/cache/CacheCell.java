@@ -3,7 +3,6 @@ package io.fireflyest.spigot.emberlib.cache;
 import java.time.Instant;
 import java.util.Set;
 import javax.annotation.Nullable;
-import io.fireflyest.spigot.emberlib.cache.api.AbstractCell;
 
 /**
  * 缓存数据存储实现类

@@ -12,8 +12,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.bukkit.plugin.Plugin;
-import io.fireflyest.spigot.emberlib.cache.api.AbstractCell;
-import io.fireflyest.spigot.emberlib.cache.api.AbstractOrganism;
 
 /**
  * 数据缓存组织实现类
