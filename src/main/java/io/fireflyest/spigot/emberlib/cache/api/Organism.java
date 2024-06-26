@@ -128,6 +128,11 @@ public interface Organism<K, V> {
     int scard(@Nonnull K key);
 
     /**
+     * 清理过期的键，以便内存释放
+     */
+    void release();
+
+    /**
      * 获取键的集合
      * @return 键的集合
      */
