@@ -2,6 +2,7 @@ package io.fireflyest.spigot.emberlib.cache.api;
 
 import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -79,10 +80,11 @@ public interface Organism<K, V> {
      * @param key 键
      * @return 值
      */
+    @Nullable
     V get(@Nonnull K key);
 
     /**
-     * 获取数据存在时间
+     * 获取数据存在时间，数据不存在则返回0
      * @param key 键
      * @return 存在时间，单位毫秒
      */
@@ -100,6 +102,7 @@ public interface Organism<K, V> {
      * @param key 键
      * @return 数据集
      */
+    @Nullable
     Set<V> smembers(@Nonnull K key);
 
     /**
@@ -114,10 +117,11 @@ public interface Organism<K, V> {
      * @param key 键
      * @return 值
      */
+    @Nullable
     V spop(@Nonnull K key);
 
     /**
-     * 获取集合里面的元素数量
+     * 获取集合里面的元素数量，数据不存在返回0
      * @param key 键
      * @return 数量
      */
