@@ -1,10 +1,11 @@
-package io.fireflyest.spigot.emberlib.cache.api;
+package io.fireflyest.spigot.emberlib.cache;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
+import io.fireflyest.spigot.emberlib.cache.api.Cell;
 
 /**
  * 缓存数据存储抽象类

@@ -1,4 +1,4 @@
-package io.fireflyest.spigot.emberlib.cache.api;
+package io.fireflyest.spigot.emberlib.cache;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import io.fireflyest.spigot.emberlib.cache.api.Organism;
 
 /**
  * 数据缓存组织抽象类
