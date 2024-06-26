@@ -6,18 +6,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.bukkit.plugin.Plugin;
-import io.fireflyest.spigot.emberlib.cache.api.Organism;
+import io.fireflyest.spigot.emberlib.cache.api.AbstractCell;
+import io.fireflyest.spigot.emberlib.cache.api.AbstractOrganism;
 
 /**
  * 数据缓存组织实现类
@@ -25,18 +21,14 @@ import io.fireflyest.spigot.emberlib.cache.api.Organism;
  * @author Fireflyest
  * @since 1.0
  */
-public class CacheOrganism implements Organism<String, String> {
-
-    private final String name;
-    private final Map<String, CacheCell> cacheMap;
-    private final Random random = new Random();
+public class CacheOrganism extends AbstractOrganism<String, String> {
 
     /**
      * 数据组织构造函数，使用普通的HashMap
      * @param name 作为保存时的文件名称
      */
     public CacheOrganism(String name) {
-        this(name, false);
+        super(name);
     }
 
     /**
@@ -45,44 +37,7 @@ public class CacheOrganism implements Organism<String, String> {
      * @param concurrent 是否使用线程安全的Map
      */
     public CacheOrganism(String name, boolean concurrent) {
-        this.name = name;
-        this.cacheMap = concurrent ? new ConcurrentHashMap<>() : new HashMap<>();
-    }
-
-    @Override
-    public void del(@Nonnull String key) {
-        cacheMap.remove(key);
-    }
-
-    @Override
-    public void expire(@Nonnull String key, int ms) {
-        final CacheCell cell = cacheMap.get(key);
-        if (cell != null && cell.get() != null) {
-            cell.expire(ms);
-        }
-    }
-
-    @Override
-    public boolean exist(@Nonnull String key) {
-        return cacheMap.containsKey(key) && cacheMap.get(key) != null;
-    }
-
-    @Override
-    public void persist(@Nonnull String key) {
-        final CacheCell cell = cacheMap.get(key);
-        if (cell != null && cell.get() != null) {
-            cell.persist();
-        }
-    }
-
-    @Override
-    public long ttl(@Nonnull String key) {
-        final CacheCell cell = cacheMap.get(key);
-        long ms = 0;
-        if (cell != null && cell.get() != null) {
-            ms = cell.ttl();
-        }
-        return ms;
+        super(name, concurrent);
     }
 
     @Override
@@ -106,85 +61,14 @@ public class CacheOrganism implements Organism<String, String> {
     }
 
     @Override
-    @Nullable
-    public String get(@Nonnull String key) {
-        return cacheMap.containsKey(key) ? cacheMap.get(key).get() : null;
-    }
-
-    @Override
-    public long age(@Nonnull String key) {
-        final CacheCell cell = cacheMap.get(key);
-        long age = 0;
-        if (cell != null && cell.get() != null) {
-            age = cell.age();
-        }
-        return age;
-    }
-
-    @Override
     public void sadd(@Nonnull String key, String value) {
-        final CacheCell cell = cacheMap.get(key);
+        final AbstractCell<String> cell = cacheMap.get(key);
         Set<String> valueSet = null;
         if (cell != null && (valueSet = cell.getAll()) != null) {
             valueSet.add(value);
         } else {
             cacheMap.put(key, new CacheCell(-1, value));
         }
-    }
-
-    @Override
-    @Nullable
-    public Set<String> smembers(@Nonnull String key) {
-        return cacheMap.containsKey(key) ? cacheMap.get(key).getAll() : null;
-    }
-
-    @Override
-    public void srem(@Nonnull String key, String value) {
-        final CacheCell cell = cacheMap.get(key);
-        Set<String> valueSet = null;
-        if (cell != null && (valueSet = cell.getAll()) != null) {
-            valueSet.remove(value);
-        }
-    }
-
-    @Override
-    @Nullable
-    public String spop(@Nonnull String key) {
-        final CacheCell cell = cacheMap.get(key);
-        Set<String> valueSet = null;
-        String value = null;
-        if (cell != null && (valueSet = cell.getAll()) != null) {
-            final int size;
-            if ((size = valueSet.size()) == 0) {
-                return value;
-            }
-            final Iterator<String> iterator = valueSet.iterator();
-            int randomInt = random.nextInt(size);
-            while (iterator.hasNext()) {
-                value = iterator.next();
-                if (randomInt-- == 0) {
-                    iterator.remove();
-                    break;
-                }
-            }
-        }
-        return value;
-    }
-
-    @Override
-    public int scard(@Nonnull String key) {
-        final CacheCell cell = cacheMap.get(key);
-        Set<String> valueSet = null;
-        int size = 0;
-        if (cell != null && (valueSet = cell.getAll()) != null) {
-            size = valueSet.size();
-        }
-        return size;
-    }
-
-    @Override
-    public Set<String> keySet() {
-        return cacheMap.keySet();
     }
 
     /**
@@ -195,11 +79,12 @@ public class CacheOrganism implements Organism<String, String> {
         try (FileOutputStream fStream = new FileOutputStream(file);
                 DataOutputStream dStream = new DataOutputStream(fStream)) {
             // 缓存迭代器
-            final Iterator<Entry<String, CacheCell>> iterator = cacheMap.entrySet().iterator(); 
+            final Iterator<Entry<String, AbstractCell<String>>> iterator 
+                = cacheMap.entrySet().iterator(); 
             // 拼接数据   
             while (iterator.hasNext()) {
-                final Entry<String, CacheCell> entry = iterator.next();
-                final CacheCell cacheCell = entry.getValue();
+                final Entry<String, AbstractCell<String>> entry = iterator.next();
+                final CacheCell cacheCell = (CacheCell) entry.getValue();
                 final Set<String> valueSet = cacheCell.getAll();
                 final Instant deadline = cacheCell.getDeadline();
                 // 已失效的不保存
