@@ -149,7 +149,9 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
     public void load(@Nonnull Plugin plugin) {
         final String fileName = name + ".cache";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
-        this.load(cacheFile);
+        if (cacheFile.exists()) {
+            this.load(cacheFile);
+        }
     }
 
 }
