@@ -1,5 +1,6 @@
 package io.fireflyest.spigot.emberlib.cache.api;
 
+import java.time.Instant;
 import java.util.Set;
 import javax.annotation.Nullable;
 
@@ -46,5 +47,18 @@ public interface Cell<T> {
      * 设置为无限期数据。
      */
     public void persist();
+
+    /**
+     * 获取起始时间
+     * @return 起始时间
+     */
+    public Instant born();
+
+    /**
+     * 获取失效时间
+     * @return 失效时间
+     */
+    @Nullable
+    public Instant deadline();
 
 }

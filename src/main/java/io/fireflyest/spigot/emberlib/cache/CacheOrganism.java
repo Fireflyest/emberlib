@@ -84,7 +84,7 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
                 final Entry<String, AbstractCell<String>> entry = iterator.next();
                 final CacheCell cacheCell = (CacheCell) entry.getValue();
                 final Set<String> valueSet = cacheCell.getAll();
-                final Instant deadline = cacheCell.getDeadline();
+                final Instant deadline = cacheCell.deadline();
                 // 已失效的不保存
                 if (valueSet == null) {
                     iterator.remove();
@@ -92,7 +92,7 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
                 }
                 // 数据信息拼接
                 dStream.writeUTF(entry.getKey()); // key
-                dStream.writeLong(cacheCell.getBorn().toEpochMilli()); // 起始时间
+                dStream.writeLong(cacheCell.born().toEpochMilli()); // 起始时间
                 dStream.writeLong(deadline == null ? 0 : deadline.toEpochMilli()); // 失效时间
                 dStream.writeInt(valueSet.size()); // 数据数量
                 // 数据集拼接
