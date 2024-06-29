@@ -17,6 +17,7 @@ public abstract class AbstractCell<T> implements Cell<T> {
 
     protected final Instant born;
     protected Instant deadline;
+
     protected final Set<T> valueSet;
 
     /**
@@ -97,4 +98,15 @@ public abstract class AbstractCell<T> implements Cell<T> {
         deadline = null;
     }
     
+    @Override
+    public Instant born() {
+        return born;
+    }
+
+    @Override
+    @Nullable
+    public Instant deadline() {
+        return deadline;
+    }
+
 }
