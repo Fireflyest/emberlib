@@ -1,6 +1,7 @@
 package io.fireflyest.spigot.emberlib.cache;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -47,7 +48,16 @@ public class CacheOrganismTest {
     public void testExist() {
         final CacheOrganism organism = new CacheOrganism(null);
         organism.set(KEY_1, VALUE_1);
+        organism.setex(KEY_2, 9, VALUE_1);
+        try {
+            synchronized (organism) {
+                organism.wait(10);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         assertTrue(organism.exist(KEY_1));
+        assertFalse(organism.exist(KEY_2));
     }
 
     @Test
