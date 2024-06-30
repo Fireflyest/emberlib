@@ -56,7 +56,7 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
 
     @Override
     public boolean exist(@Nonnull K key) {
-        return cacheMap.containsKey(key) && cacheMap.get(key) != null;
+        return cacheMap.containsKey(key) && cacheMap.get(key).get() != null;
     }
 
     @Override
