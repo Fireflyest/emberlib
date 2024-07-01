@@ -161,8 +161,18 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
     }
 
     @Override
+    public void load(@Nonnull Plugin plugin, @Nonnull String entryName) {
+        this.load(plugin, entryName, false);
+    }
+
+    @Override
     public void load(@Nonnull Plugin plugin) {
         this.load(plugin, "latest");
+    }
+
+    @Override
+    public void save(@Nonnull Plugin plugin, @Nonnull String entryName) {
+        this.save(plugin, entryName, false);
     }
 
     @Override

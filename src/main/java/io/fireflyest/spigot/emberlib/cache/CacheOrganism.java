@@ -79,7 +79,7 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
      * @param file 缓存文件
      * @param entryName 压缩内文件名称
      */
-    public void save(@Nonnull File file, @Nonnull String entryName) {
+    public void save(@Nonnull File file, @Nonnull String entryName, boolean reset) {
         try (FileOutputStream fStream = new FileOutputStream(file);
                 ZipOutputStream zStream = new ZipOutputStream(fStream);
                 DataOutputStream dStream = new DataOutputStream(zStream)) {
@@ -93,6 +93,7 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
                 = cacheMap.entrySet().iterator(); 
             // 拼接数据   
             while (iterator.hasNext()) {
+                // key(String) born(long) deadline(long) count(int) [obj(String)]
                 final Entry<String, AbstractCell<String>> entry = iterator.next();
                 final CacheCell cacheCell = (CacheCell) entry.getValue();
                 final Set<String> valueSet = cacheCell.getAll();
@@ -117,18 +118,20 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if (reset) {
+            cacheMap.clear();
+        }
     }
 
     /**
      * 保存格式为
-     * key(String) born(long) deadline(long) count(int) [obj(String)]
      */
     @Override
-    public void save(@Nonnull Plugin plugin, @Nonnull String entryName) {
+    public void save(@Nonnull Plugin plugin, @Nonnull String entryName, boolean reset) {
         final String fileName = name + ".orga";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
-        this.save(cacheFile, entryName);
-        
+        this.save(cacheFile, entryName, reset);
     }
 
     /**
@@ -136,7 +139,11 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
      * @param file 缓存文件
      * @param entryName 压缩内文件名称
      */
-    public void load(@Nonnull File file, @Nonnull String entryName) {
+    public void load(@Nonnull File file, @Nonnull String entryName, boolean reset) {
+        if (reset) {
+            cacheMap.clear();
+        }
+
         try (ZipFile zipFile = new ZipFile(file);
                 InputStream entryInputStream = zipFile.getInputStream(zipFile.getEntry(entryName));
                 DataInputStream dStream = new DataInputStream(entryInputStream)) {
@@ -162,11 +169,11 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
     }
 
     @Override
-    public void load(@Nonnull Plugin plugin, @Nonnull String entryName) {
+    public void load(@Nonnull Plugin plugin, @Nonnull String entryName, boolean reset) {
         final String fileName = name + ".orga";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
         if (cacheFile.exists()) {
-            this.load(cacheFile, entryName);
+            this.load(cacheFile, entryName, reset);
         }
     }
 

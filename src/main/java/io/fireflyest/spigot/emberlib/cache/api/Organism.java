@@ -46,13 +46,6 @@ public interface Organism<K, V> {
     long ttl(@Nonnull K key);
 
     /**
-     * 设置无期限数据
-     * @param key 键
-     * @param value 值
-     */
-    void set(@Nonnull K key, V value);
-
-    /**
      * 设置无期限数据集合
      * @param key 键
      * @param valueSet 值集
@@ -60,12 +53,11 @@ public interface Organism<K, V> {
     void set(@Nonnull K key, Set<V> valueSet);
 
     /**
-     * 设置限期数据
+     * 设置无期限数据
      * @param key 键
-     * @param ms 失效时间，单位毫秒
      * @param value 值
      */
-    void setex(@Nonnull K key, int ms, V value);
+    void set(@Nonnull K key, V value);
 
     /**
      * 设置限期数据
@@ -74,6 +66,14 @@ public interface Organism<K, V> {
      * @param valueSet 值集
      */
     void setex(@Nonnull K key, int ms, Set<V> valueSet);
+
+    /**
+     * 设置限期数据
+     * @param key 键
+     * @param ms 失效时间，单位毫秒
+     * @param value 值
+     */
+    void setex(@Nonnull K key, int ms, V value);
 
     /**
      * 获取数据
@@ -141,8 +141,10 @@ public interface Organism<K, V> {
     /**
      * 保存缓存到插件的目录下
      * @param plugin 插件
+     * @param entryName 存储分支
+     * @param reset 保存后重置数据
      */
-    void save(@Nonnull Plugin plugin);
+    void save(@Nonnull Plugin plugin, @Nonnull String entryName, boolean reset);
 
     /**
      * 保存缓存到插件的目录下
@@ -152,10 +154,18 @@ public interface Organism<K, V> {
     void save(@Nonnull Plugin plugin, @Nonnull String entryName);
 
     /**
-     * 从插件的目录里加载缓存
+     * 保存缓存到插件的目录下
      * @param plugin 插件
      */
-    void load(@Nonnull Plugin plugin);
+    void save(@Nonnull Plugin plugin);
+
+    /**
+     * 从插件的目录里加载缓存
+     * @param plugin 插件
+     * @param entryName 存储分支
+     * @param reset 加载前重置数据
+     */
+    void load(@Nonnull Plugin plugin, @Nonnull String entryName, boolean reset);
 
     /**
      * 从插件的目录里加载缓存
@@ -163,5 +173,11 @@ public interface Organism<K, V> {
      * @param entryName 存储分支
      */
     void load(@Nonnull Plugin plugin, @Nonnull String entryName);
+
+    /**
+     * 从插件的目录里加载缓存
+     * @param plugin 插件
+     */
+    void load(@Nonnull Plugin plugin);
 
 }

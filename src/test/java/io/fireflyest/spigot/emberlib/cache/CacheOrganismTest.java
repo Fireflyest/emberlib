@@ -127,10 +127,10 @@ public class CacheOrganismTest {
             e.printStackTrace();
         }
 
-        organism.save(file, "latest");
+        organism.save(file, "latest", false);
 
         final CacheOrganism organismLoad = new CacheOrganism(null);
-        organismLoad.load(file, "latest");
+        organismLoad.load(file, "latest", false);
 
         assertEquals(3, organismLoad.scard(KEY_1));
         assertEquals(VALUE_2, organismLoad.get(KEY_2));
