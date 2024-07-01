@@ -3,13 +3,17 @@ package io.fireflyest.spigot.emberlib.cache;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 import javax.annotation.Nonnull;
 import org.bukkit.plugin.Plugin;
 import io.fireflyest.spigot.emberlib.util.StringUtils;
@@ -73,10 +77,17 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
     /**
      * 保存缓存到文件
      * @param file 缓存文件
+     * @param entryName 压缩内文件名称
      */
-    public void save(@Nonnull File file) {
+    public void save(@Nonnull File file, @Nonnull String entryName) {
         try (FileOutputStream fStream = new FileOutputStream(file);
-                DataOutputStream dStream = new DataOutputStream(fStream)) {
+                ZipOutputStream zStream = new ZipOutputStream(fStream);
+                DataOutputStream dStream = new DataOutputStream(zStream)) {
+            
+            final ZipEntry zipEntry = new ZipEntry(entryName);
+            zStream.putNextEntry(zipEntry);
+            zStream.setComment("cache organism");
+
             // 缓存迭代器
             final Iterator<Entry<String, AbstractCell<String>>> iterator 
                 = cacheMap.entrySet().iterator(); 
@@ -102,6 +113,7 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
                 }
             }
             dStream.flush();
+            zStream.closeEntry();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -113,19 +125,22 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
      */
     @Override
     public void save(@Nonnull Plugin plugin) {
-        final String fileName = name + ".cache";
+        final String fileName = name + ".orga";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
-        this.save(cacheFile);
+        this.save(cacheFile, "latest");
         
     }
 
     /**
      * 从文件加载数据到缓存
      * @param file 缓存文件
+     * @param entryName 压缩内文件名称
      */
-    public void load(@Nonnull File file) {
-        try (FileInputStream fStream = new FileInputStream(file);
-                DataInputStream dStream = new DataInputStream(fStream)) {
+    public void load(@Nonnull File file, @Nonnull String entryName) {
+        try (ZipFile zipFile = new ZipFile(file);
+                InputStream entryInputStream = zipFile.getInputStream(zipFile.getEntry(entryName));
+                DataInputStream dStream = new DataInputStream(entryInputStream)) {
+
             // 读取整个文件
             while (dStream.available() > 0) {
                 final String key = StringUtils.base64Decode(dStream.readUTF());
@@ -141,17 +156,17 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
                     cacheMap.put(key, new CacheCell(born, deadline, valueSet));
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
     public void load(@Nonnull Plugin plugin) {
-        final String fileName = name + ".cache";
+        final String fileName = name + ".orga";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
         if (cacheFile.exists()) {
-            this.load(cacheFile);
+            this.load(cacheFile, "latest");
         }
     }
 

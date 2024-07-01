@@ -18,9 +18,11 @@ public class CacheOrganismTest {
     public static final String KEY_1 = "key1";
     public static final String KEY_2 = "key2";
     public static final String KEY_3 = "key3";
+    public static final String KEY_4 = "key4";
     public static final String VALUE_1 = "value1";
     public static final String VALUE_2 = "value2";
     public static final String VALUE_3 = "value3";
+    public static final String VALUE_4 = "value4";
 
     @Test
     public void testAge() {
@@ -105,15 +107,17 @@ public class CacheOrganismTest {
 
     @Test
     public void testSaveAndLoad() {
-        final File file = new File("./test.cache");
+        final File file = new File("./test.orga");
         final CacheOrganism organism = new CacheOrganism(null);
+        // 集合
         organism.set(KEY_1, VALUE_1);
         organism.sadd(KEY_1, VALUE_2);
         organism.sadd(KEY_1, VALUE_3);
-
+        // 键值对
         organism.set(KEY_2, VALUE_2);
-
+        // 限时键值对
         organism.setex(KEY_3, 9, VALUE_3);
+        organism.setex(KEY_4, 900, VALUE_4);
 
         try {
             synchronized (organism) {
@@ -123,14 +127,15 @@ public class CacheOrganismTest {
             e.printStackTrace();
         }
 
-        organism.save(file);
+        organism.save(file, "latest");
 
         final CacheOrganism organismLoad = new CacheOrganism(null);
-        organismLoad.load(file);
+        organismLoad.load(file, "latest");
 
         assertEquals(3, organismLoad.scard(KEY_1));
         assertEquals(VALUE_2, organismLoad.get(KEY_2));
         assertNull(organismLoad.get(KEY_3));
+        assertTrue(organismLoad.exist(KEY_4));
 
     }
 
