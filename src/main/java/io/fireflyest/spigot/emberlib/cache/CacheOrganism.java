@@ -124,9 +124,6 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
         }
     }
 
-    /**
-     * 保存格式为
-     */
     @Override
     public void save(@Nonnull Plugin plugin, @Nonnull String entryName, boolean reset) {
         final String fileName = name + ".orga";
