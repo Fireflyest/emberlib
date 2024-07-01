@@ -124,10 +124,10 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
      * key(String) born(long) deadline(long) count(int) [obj(String)]
      */
     @Override
-    public void save(@Nonnull Plugin plugin) {
+    public void save(@Nonnull Plugin plugin, @Nonnull String entryName) {
         final String fileName = name + ".orga";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
-        this.save(cacheFile, "latest");
+        this.save(cacheFile, entryName);
         
     }
 
@@ -162,11 +162,11 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
     }
 
     @Override
-    public void load(@Nonnull Plugin plugin) {
+    public void load(@Nonnull Plugin plugin, @Nonnull String entryName) {
         final String fileName = name + ".orga";
         final File cacheFile = new File(plugin.getDataFolder(), fileName);
         if (cacheFile.exists()) {
-            this.load(cacheFile, "latest");
+            this.load(cacheFile, entryName);
         }
     }
 

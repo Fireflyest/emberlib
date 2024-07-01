@@ -145,9 +145,23 @@ public interface Organism<K, V> {
     void save(@Nonnull Plugin plugin);
 
     /**
+     * 保存缓存到插件的目录下
+     * @param plugin 插件
+     * @param entryName 存储分支
+     */
+    void save(@Nonnull Plugin plugin, @Nonnull String entryName);
+
+    /**
      * 从插件的目录里加载缓存
      * @param plugin 插件
      */
     void load(@Nonnull Plugin plugin);
+
+    /**
+     * 从插件的目录里加载缓存
+     * @param plugin 插件
+     * @param entryName 存储分支
+     */
+    void load(@Nonnull Plugin plugin, @Nonnull String entryName);
 
 }
