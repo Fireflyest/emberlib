@@ -79,6 +79,37 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
     }
 
     @Override
+    public void set(@Nonnull K key, V value) {
+        cacheMap.put(key, new AbstractCell<V>(-1, value) {});
+    }
+
+    @Override
+    public void set(@Nonnull K key, Set<V> valueSet) {
+        cacheMap.put(key, new AbstractCell<V>(-1, valueSet) {});
+    }
+
+    @Override
+    public void setex(@Nonnull K key, int ms, V value) {
+        cacheMap.put(key, new AbstractCell<V>(ms, value) {});
+    }
+
+    @Override
+    public void setex(@Nonnull K key, int ms, Set<V> valueSet) {
+        cacheMap.put(key, new AbstractCell<V>(ms, valueSet) {});
+    }
+
+    @Override
+    public void sadd(@Nonnull K key, V value) {
+        final AbstractCell<V> cell = cacheMap.get(key);
+        Set<V> valueSet = null;
+        if (cell != null && (valueSet = cell.getAll()) != null) {
+            valueSet.add(value);
+        } else {
+            cacheMap.put(key, new AbstractCell<V>(-1, value) {});
+        }
+    }
+
+    @Override
     @Nullable
     public V get(@Nonnull K key) {
         return cacheMap.containsKey(key) ? cacheMap.get(key).get() : null;
