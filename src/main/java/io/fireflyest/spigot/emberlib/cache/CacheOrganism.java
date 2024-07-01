@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.bukkit.plugin.Plugin;
+import io.fireflyest.spigot.emberlib.util.StringUtils;
 
 /**
  * 数据缓存组织实现类
@@ -91,13 +92,13 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
                     continue;
                 }
                 // 数据信息拼接
-                dStream.writeUTF(entry.getKey()); // key
+                dStream.writeUTF(StringUtils.base64Encode(entry.getKey())); // key
                 dStream.writeLong(cacheCell.born().toEpochMilli()); // 起始时间
                 dStream.writeLong(deadline == null ? 0 : deadline.toEpochMilli()); // 失效时间
                 dStream.writeInt(valueSet.size()); // 数据数量
                 // 数据集拼接
                 for (String value : valueSet) {
-                    dStream.writeUTF(value); // 数据
+                    dStream.writeUTF(StringUtils.base64Encode(value)); // 数据
                 }
             }
             dStream.flush();
@@ -127,14 +128,14 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
                 DataInputStream dStream = new DataInputStream(fStream)) {
             // 读取整个文件
             while (dStream.available() > 0) {
-                final String key = dStream.readUTF();
+                final String key = StringUtils.base64Decode(dStream.readUTF());
                 final Instant born = Instant.ofEpochMilli(dStream.readLong());
                 final long dl = dStream.readLong();
                 final Instant deadline = dl == 0 ? null : Instant.ofEpochMilli(dl);
                 final int count = dStream.readInt();
                 final Set<String> valueSet = new HashSet<>();
                 for (int i = 0; i < count; i++) {
-                    valueSet.add(dStream.readUTF());
+                    valueSet.add(StringUtils.base64Decode(dStream.readUTF()));
                 }
                 if (deadline == null || Instant.now().isBefore(deadline)) {
                     cacheMap.put(key, new CacheCell(born, deadline, valueSet));
