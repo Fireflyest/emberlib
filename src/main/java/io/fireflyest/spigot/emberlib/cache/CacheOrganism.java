@@ -43,37 +43,6 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
         super(name, concurrent);
     }
 
-    @Override
-    public void set(@Nonnull String key, String value) {
-        cacheMap.put(key, new CacheCell(-1, value));
-    }
-
-    @Override
-    public void set(@Nonnull String key, Set<String> valueSet) {
-        cacheMap.put(key, new CacheCell(-1, valueSet));
-    }
-
-    @Override
-    public void setex(@Nonnull String key, int ms, String value) {
-        cacheMap.put(key, new CacheCell(ms, value));
-    }
-
-    @Override
-    public void setex(@Nonnull String key, int ms, Set<String> valueSet) {
-        cacheMap.put(key, new CacheCell(ms, valueSet));
-    }
-
-    @Override
-    public void sadd(@Nonnull String key, String value) {
-        final AbstractCell<String> cell = cacheMap.get(key);
-        Set<String> valueSet = null;
-        if (cell != null && (valueSet = cell.getAll()) != null) {
-            valueSet.add(value);
-        } else {
-            cacheMap.put(key, new CacheCell(-1, value));
-        }
-    }
-
     /**
      * 保存缓存到文件
      * @param file 缓存文件
@@ -95,7 +64,7 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
             while (iterator.hasNext()) {
                 // key(String) born(long) deadline(long) count(int) [obj(String)]
                 final Entry<String, AbstractCell<String>> entry = iterator.next();
-                final CacheCell cacheCell = (CacheCell) entry.getValue();
+                final AbstractCell<String> cacheCell = entry.getValue();
                 final Set<String> valueSet = cacheCell.getAll();
                 final Instant deadline = cacheCell.deadline();
                 // 已失效的不保存
@@ -157,7 +126,7 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
                     valueSet.add(StringUtils.base64Decode(dStream.readUTF()));
                 }
                 if (deadline == null || Instant.now().isBefore(deadline)) {
-                    cacheMap.put(key, new CacheCell(born, deadline, valueSet));
+                    cacheMap.put(key, new AbstractCell<String>(born, deadline, valueSet) {});
                 }
             }
         } catch (IOException e) {
