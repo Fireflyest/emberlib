@@ -13,13 +13,13 @@ public class StringUtilsTest {
     @Test
     public void testAppend() {
         final String str = StringUtils.append("str", '+', 10, 1.0, true);
-        assertEquals(str, "str+101.0true");
+        assertEquals("str+101.0true", str);
     }
 
     @Test
     public void testFormat() {
         final String str = StringUtils.format("test{}test{}", 1, true);
-        assertEquals(str, "test1testtrue");
+        assertEquals("test1testtrue", str);
     }
 
     @Test
@@ -40,24 +40,24 @@ public class StringUtilsTest {
     @Test
     public void testToSentence() {
         assertNull(StringUtils.toSentence(null));
-        assertEquals(StringUtils.toSentence(""), "");
-        assertEquals(StringUtils.toSentence("a"), "a");
-        assertEquals(StringUtils.toSentence("null"), "null");
-        assertEquals(StringUtils.toSentence("camelCamel"), "camel camel");
-        assertEquals(StringUtils.toSentence("CONSTANT_CONSTANT"), "constant constant");
-        assertEquals(StringUtils.toSentence("dot.dot"), "dot dot");
-        assertEquals(StringUtils.toSentence("PascalPascal"), "Pascal pascal");
-        assertEquals(StringUtils.toSentence("path\\path"), "path path");
-        assertEquals(StringUtils.toSentence("snake_snake"), "snake snake");
-        assertEquals(StringUtils.toSentence("Title Title"), "title title");
+        assertEquals("", StringUtils.toSentence(""));
+        assertEquals("a", StringUtils.toSentence("a"));
+        assertEquals("null", StringUtils.toSentence("null"));
+        assertEquals("camel camel", StringUtils.toSentence("camelCamel"));
+        assertEquals("constant constant", StringUtils.toSentence("CONSTANT_CONSTANT"));
+        assertEquals("dot dot", StringUtils.toSentence("dot.dot"));
+        assertEquals("Pascal pascal", StringUtils.toSentence("PascalPascal"));
+        assertEquals("path path", StringUtils.toSentence("path\\path"));
+        assertEquals("snake snake", StringUtils.toSentence("snake_snake"));
+        assertEquals("title title", StringUtils.toSentence("Title Title"));
     }
 
     @Test
     public void testUpperFirst() {
         assertNull(StringUtils.upperFirst(null));
-        assertEquals(StringUtils.upperFirst(""), "");
-        assertEquals(StringUtils.upperFirst("a"), "A");
-        assertEquals(StringUtils.upperFirst("null"), "Null");
+        assertEquals("", StringUtils.upperFirst(""));
+        assertEquals("A", StringUtils.upperFirst("a"));
+        assertEquals("Null", StringUtils.upperFirst("null"));
     }
 
 }
