@@ -139,25 +139,32 @@ public interface Organism<K, V> {
     Set<K> keySet();
 
     /**
-     * 保存缓存到插件的目录下
-     * @param plugin 插件
-     * @param entryName 存储分支
-     * @param reset 保存后重置数据
+     * 反序列化键
+     * @param keyStr 文本
+     * @return 键
      */
-    void save(@Nonnull Plugin plugin, @Nonnull String entryName, boolean reset);
+    K deserializeKey(@Nonnull String keyStr);
 
     /**
-     * 保存缓存到插件的目录下
-     * @param plugin 插件
-     * @param entryName 存储分支
+     * 反序列化值
+     * @param valueStr 文本
+     * @return 值
      */
-    void save(@Nonnull Plugin plugin, @Nonnull String entryName);
+    V deserializeValue(@Nonnull String valueStr);
 
     /**
-     * 保存缓存到插件的目录下
-     * @param plugin 插件
+     * 序列化键
+     * @param key 键
+     * @return 文本
      */
-    void save(@Nonnull Plugin plugin);
+    String serializeKey(@Nonnull K key);
+
+    /**
+     * 序列化值
+     * @param value 值
+     * @return 文本
+     */
+    String serializeValue(@Nonnull V value);
 
     /**
      * 从插件的目录里加载缓存
@@ -179,5 +186,26 @@ public interface Organism<K, V> {
      * @param plugin 插件
      */
     void load(@Nonnull Plugin plugin);
+
+    /**
+     * 保存缓存到插件的目录下
+     * @param plugin 插件
+     * @param entryName 存储分支
+     * @param reset 保存后重置数据
+     */
+    void save(@Nonnull Plugin plugin, @Nonnull String entryName, boolean reset);
+
+    /**
+     * 保存缓存到插件的目录下
+     * @param plugin 插件
+     * @param entryName 存储分支
+     */
+    void save(@Nonnull Plugin plugin, @Nonnull String entryName);
+
+    /**
+     * 保存缓存到插件的目录下
+     * @param plugin 插件
+     */
+    void save(@Nonnull Plugin plugin);
 
 }
