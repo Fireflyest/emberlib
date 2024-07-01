@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.bukkit.plugin.Plugin;
 import io.fireflyest.spigot.emberlib.cache.api.Organism;
 
 /**
@@ -157,6 +158,16 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
     @Override
     public Set<K> keySet() {
         return cacheMap.keySet();
+    }
+
+    @Override
+    public void load(@Nonnull Plugin plugin) {
+        this.load(plugin, "latest");
+    }
+
+    @Override
+    public void save(@Nonnull Plugin plugin) {
+        this.save(plugin, "latest");
     }
 
 }
