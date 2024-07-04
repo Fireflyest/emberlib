@@ -1,11 +1,9 @@
-package io.fireflyest.spigot.emberlib.util;
+package io.fireflyest.emberlib.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
-
-import io.fireflyest.emberlib.util.StrUtils;
 
 /**
  * 文本工具类测试
@@ -22,21 +20,6 @@ public class StrUtilsTest {
     public void testFormat() {
         final String str = StrUtils.format("test{}test{}", 1, true);
         assertEquals("test1testtrue", str);
-    }
-
-    @Test
-    public void testJsonToList() {
-
-    }
-
-    @Test
-    public void testJsonToObj() {
-
-    }
-
-    @Test
-    public void testToJson() {
-
     }
 
     @Test

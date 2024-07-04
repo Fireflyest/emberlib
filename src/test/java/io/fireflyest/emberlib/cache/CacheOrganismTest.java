@@ -1,4 +1,4 @@
-package io.fireflyest.spigot.emberlib.cache;
+package io.fireflyest.emberlib.cache;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,8 +9,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Set;
 import org.junit.Test;
-
-import io.fireflyest.emberlib.cache.CacheOrganism;
 
 /**
  * 缓存测试
