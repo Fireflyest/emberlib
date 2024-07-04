@@ -1,4 +1,4 @@
-package io.fireflyest.spigot.emberlib.cache;
+package io.fireflyest.emberlib.cache;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,7 +22,8 @@ import java.util.zip.ZipOutputStream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bukkit.plugin.Plugin;
-import io.fireflyest.spigot.emberlib.cache.api.Organism;
+
+import io.fireflyest.emberlib.cache.api.Organism;
 
 /**
  * 数据缓存组织抽象类

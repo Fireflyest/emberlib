@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
+import io.fireflyest.emberlib.util.StrUtils;
+
 /**
  * 文本工具类测试
  */

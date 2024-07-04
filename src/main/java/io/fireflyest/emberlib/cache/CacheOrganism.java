@@ -1,7 +1,8 @@
-package io.fireflyest.spigot.emberlib.cache;
+package io.fireflyest.emberlib.cache;
 
 import javax.annotation.Nonnull;
-import io.fireflyest.spigot.emberlib.util.StrUtils;
+
+import io.fireflyest.emberlib.util.StrUtils;
 
 /**
  * 数据缓存组织实现类

@@ -1,4 +1,4 @@
-package io.fireflyest.spigot.emberlib.cache.api;
+package io.fireflyest.emberlib.cache.api;
 
 import java.util.Set;
 import javax.annotation.Nonnull;

@@ -1,4 +1,4 @@
-package io.fireflyest.spigot.emberlib.util;
+package io.fireflyest.emberlib.util;
 
 import java.util.Base64;
 import java.util.Collections;

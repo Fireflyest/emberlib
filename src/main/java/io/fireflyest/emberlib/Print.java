@@ -1,4 +1,4 @@
-package io.fireflyest.spigot.emberlib;
+package io.fireflyest.emberlib;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

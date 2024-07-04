@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.Set;
 import org.junit.Test;
 
+import io.fireflyest.emberlib.cache.CacheOrganism;
+
 /**
  * 缓存测试
  */

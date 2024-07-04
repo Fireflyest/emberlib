@@ -1,4 +1,4 @@
-package io.fireflyest.spigot.emberlib;
+package io.fireflyest.emberlib;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
