@@ -1,7 +1,7 @@
 package io.fireflyest.spigot.emberlib.cache;
 
 import javax.annotation.Nonnull;
-import io.fireflyest.spigot.emberlib.util.StringUtils;
+import io.fireflyest.spigot.emberlib.util.StrUtils;
 
 /**
  * 数据缓存组织实现类
@@ -30,22 +30,22 @@ public class CacheOrganism extends AbstractOrganism<String, String> {
 
     @Override
     public String deserializeKey(@Nonnull String keyStr) {
-        return StringUtils.base64Decode(keyStr);
+        return StrUtils.base64Decode(keyStr);
     }
 
     @Override
     public String deserializeValue(@Nonnull String valueStr) {
-        return StringUtils.base64Decode(valueStr);
+        return StrUtils.base64Decode(valueStr);
     }
 
     @Override
     public String serializeKey(@Nonnull String key) {
-        return StringUtils.base64Encode(key);
+        return StrUtils.base64Encode(key);
     }
 
     @Override
     public String serializeValue(@Nonnull String value) {
-        return StringUtils.base64Encode(value);
+        return StrUtils.base64Encode(value);
     }
 
 }
