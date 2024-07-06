@@ -250,4 +250,31 @@ public class CacheOrganismTest {
         assertEquals(0, organism.ttl(KEY_3));
     }
 
+    @Test
+    public void testRelease() {
+        final CacheOrganism organism = new CacheOrganism(null);
+        organism.setex(KEY_1, 9, VALUE_1);
+        organism.set(KEY_2, VALUE_2);
+        organism.setex(KEY_3, 4, VALUE_3);
+        assertEquals(3, organism.keySet().size());
+        try {
+            synchronized (organism) {
+                organism.wait(5);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertEquals(3, organism.keySet().size());
+        try {
+            synchronized (organism) {
+                organism.wait(5);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertEquals(3, organism.keySet().size());
+        organism.release();
+        assertEquals(1, organism.keySet().size());
+    }
+
 }

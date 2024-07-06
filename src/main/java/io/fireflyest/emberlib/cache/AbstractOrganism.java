@@ -188,13 +188,7 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
 
     @Override
     public void release() {
-        final Iterator<Entry<K, AbstractCell<V>>> iterator = cacheMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            final Entry<K, AbstractCell<V>> entry = iterator.next();
-            if (entry.getValue().get() == null) {
-                iterator.remove();
-            }
-        }
+        cacheMap.entrySet().removeIf(entry -> entry.getValue().get() == null);
     }
 
     @Override
