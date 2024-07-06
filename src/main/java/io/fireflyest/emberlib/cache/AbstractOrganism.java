@@ -18,11 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bukkit.plugin.Plugin;
-
 import io.fireflyest.emberlib.cache.api.Organism;
 
 /**
@@ -223,23 +221,6 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
         this.load(plugin, "latest");
     }
 
-    @Override
-    public void save(@Nonnull Plugin plugin, @Nonnull String entryName, boolean reset) {
-        final String fileName = name + ".orga";
-        final File cacheFile = new File(plugin.getDataFolder(), fileName);
-        this.save(cacheFile, entryName, reset);
-    }
-
-    @Override
-    public void save(@Nonnull Plugin plugin, @Nonnull String entryName) {
-        this.save(plugin, entryName, false);
-    }
-
-    @Override
-    public void save(@Nonnull Plugin plugin) {
-        this.save(plugin, "latest");
-    }
-
     /**
      * 从文件加载数据到缓存
      * @param file 缓存文件
@@ -272,6 +253,23 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void save(@Nonnull Plugin plugin, @Nonnull String entryName, boolean reset) {
+        final String fileName = name + ".orga";
+        final File cacheFile = new File(plugin.getDataFolder(), fileName);
+        this.save(cacheFile, entryName, reset);
+    }
+
+    @Override
+    public void save(@Nonnull Plugin plugin, @Nonnull String entryName) {
+        this.save(plugin, entryName, false);
+    }
+
+    @Override
+    public void save(@Nonnull Plugin plugin) {
+        this.save(plugin, "latest");
     }
 
     /**
