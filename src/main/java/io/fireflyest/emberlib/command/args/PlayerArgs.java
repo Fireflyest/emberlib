@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
  * @author Fireflyest
  * @since 1.0
  */
-public class PlayerArgs implements Argument {
+public final class PlayerArgs implements Argument {
 
     @Override
     @Nullable

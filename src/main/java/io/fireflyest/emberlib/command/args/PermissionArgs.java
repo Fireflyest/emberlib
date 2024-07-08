@@ -14,7 +14,7 @@ import org.bukkit.permissions.Permission;
  * @author Fireflyest
  * @since 1.0
  */
-public class PermissionArgument implements Argument {
+public final class PermissionArgs implements Argument {
 
     @Override
     public List<String> tab(@Nonnull CommandSender sender, @Nonnull String arg) {

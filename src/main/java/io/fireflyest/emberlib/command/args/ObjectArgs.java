@@ -13,7 +13,7 @@ import org.bukkit.command.CommandSender;
  * @author Fireflyest
  * @since 1.0
  */
-public class ObjectArgs implements Argument {
+public final class ObjectArgs implements Argument {
 
     /**
      * 提示列表

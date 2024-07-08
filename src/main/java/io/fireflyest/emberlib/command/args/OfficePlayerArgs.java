@@ -13,7 +13,7 @@ import org.bukkit.command.CommandSender;
  * @author Fireflyest
  * @since 1.0
  */
-public class OfficePlayerArgs implements Argument {
+public final class OfficePlayerArgs implements Argument {
 
     @Override
     public List<String> tab(@Nonnull CommandSender sender, @Nonnull String arg) {

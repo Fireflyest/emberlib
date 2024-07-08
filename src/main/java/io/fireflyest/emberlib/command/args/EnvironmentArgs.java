@@ -12,7 +12,7 @@ import org.bukkit.command.CommandSender;
  * @author Fireflyest
  * @since 
  */
-public class EnvironmentArgument implements Argument {
+public final class EnvironmentArgs implements Argument {
 
     @Override
     public List<String> tab(@Nonnull CommandSender sender, @Nonnull String arg) {
