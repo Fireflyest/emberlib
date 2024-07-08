@@ -1,5 +1,6 @@
 package io.fireflyest.emberlib.command;
 
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import io.fireflyest.emberlib.command.args.Argument;
@@ -30,15 +31,23 @@ public abstract class SubCommand extends AbstractCommand {
      * 子指令
      */
     protected SubCommand() {
-        this(null);
+        super();
+    }
+
+    @Override
+    public SubCommand async() {
+        super.async();
+        return this;
     }
 
     /**
      * 添加变量
+     * 
      * @param arg 变量
      * @return 本身
      */
     public SubCommand addArg(@Nonnull Argument arg) {
+        final List<Argument> arguments = this.getArguments();
         if (arguments.size() < MAX_ARGS) {
             arguments.add(arg);
         }

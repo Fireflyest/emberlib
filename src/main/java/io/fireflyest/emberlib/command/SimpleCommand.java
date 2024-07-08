@@ -33,7 +33,7 @@ public abstract class SimpleCommand extends AbstractCommand
      * 简单指令
      */
     protected SimpleCommand() {
-        this(null);
+        super();
     }
 
     @Override
@@ -55,12 +55,20 @@ public abstract class SimpleCommand extends AbstractCommand
         return this.getArgumentTab(index, sender, args[index]);
     }
 
+    @Override
+    public SimpleCommand async() {
+        super.async();
+        return this;
+    }
+
     /**
      * 添加变量
+     * 
      * @param arg 变量
      * @return 本身
      */
     public SimpleCommand addArg(@Nonnull Argument arg) {
+        final List<Argument> arguments = this.getArguments();
         if (arguments.size() < MAX_ARGS) {
             arguments.add(arg);
         }
@@ -72,7 +80,8 @@ public abstract class SimpleCommand extends AbstractCommand
      * 
      * @param plugin 插件
      */
-    public AbstractCommand apply(@Nonnull JavaPlugin plugin) {
+    public SimpleCommand apply(@Nonnull JavaPlugin plugin) {
+        this.plugin = plugin;
         final PluginCommand command = plugin.getCommand(this.getName());
         if (command != null) {
             command.setExecutor(this);
@@ -89,22 +98,13 @@ public abstract class SimpleCommand extends AbstractCommand
      */
     private boolean executeCommand(@Nonnull CommandSender sender, @Nonnull String[] args) {
         boolean valid = false;
-        switch (args.length) {
-            case 0:
-                valid = execute(sender);
-                break;
-            case 1:
-                valid = execute(sender, args[0]);
-                break;
-            case 2:
-                valid = execute(sender, args[0], args[1]);
-                break;
-            case 3:
-                valid = execute(sender, args[0], args[1], args[2]);
-                break;
-            default:
-                valid = execute(sender, args);
-                break;
+        final CommandRunnable runnable = this.runnable(sender, args);
+        if (this.isAsync() && plugin != null) {
+            runnable.runTaskAsynchronously(plugin);
+            valid = true;
+        } else {
+            runnable.run();
+            valid = runnable.isValid();
         }
         return valid;
     }

@@ -38,7 +38,7 @@ public abstract class ComplexCommand extends AbstractCommand
         super(name);
 
         // 第一个参数的提示为子指令
-        this.arguments.add((sender, arg) -> {
+        this.getArguments().add((sender, arg) -> {
             final List<String> argList = new ArrayList<>();
             for (String string : subCommands.keySet()) {
                 if (string.startsWith(arg)) {
@@ -82,6 +82,12 @@ public abstract class ComplexCommand extends AbstractCommand
         return list;
     }
 
+    @Override
+    public ComplexCommand async() {
+        super.async();
+        return this;
+    }
+
     /**
      * 添加子指令
      * 
@@ -98,7 +104,8 @@ public abstract class ComplexCommand extends AbstractCommand
      * 
      * @param plugin 插件
      */
-    public AbstractCommand apply(@Nonnull JavaPlugin plugin) {
+    public ComplexCommand apply(@Nonnull JavaPlugin plugin) {
+        this.plugin = plugin;
         final PluginCommand command = plugin.getCommand(this.getName());
         if (command != null) {
             command.setExecutor(this);
@@ -115,28 +122,25 @@ public abstract class ComplexCommand extends AbstractCommand
      */
     private boolean executeCommand(@Nonnull CommandSender sender, @Nonnull String[] args) {
         boolean valid = false;
+        boolean async = false;
         SubCommand subCommand = null;
+        CommandRunnable runnable = null;
         if (args.length == 0) {
-            valid = execute(sender);
+            async = this.isAsync();
+            runnable = this.runnable(sender, args);
         } else if ((subCommand = subCommands.get(args[0])) != null) {
             final String[] subArgs = new String[args.length - 1];
             System.arraycopy(args, 1, subArgs, 0, args.length - 1);
-            switch (subArgs.length) {
-                case 0:
-                    valid = subCommand.execute(sender);
-                    break;
-                case 1:
-                    valid = subCommand.execute(sender, subArgs[0]);
-                    break;
-                case 2:
-                    valid = subCommand.execute(sender, subArgs[0], subArgs[1]);
-                    break;
-                case 3:
-                    valid = subCommand.execute(sender, subArgs[0], subArgs[1], subArgs[2]);
-                    break;
-                default:
-                    valid = subCommand.execute(sender, subArgs);
-                    break;
+            async = subCommand.isAsync();
+            runnable = subCommand.runnable(sender, subArgs);
+        }
+        if (runnable != null) {
+            if (async && plugin != null) {
+                runnable.runTaskAsynchronously(plugin);
+                valid = true;
+            } else {
+                runnable.run();
+                valid = runnable.isValid();
             }
         }
         return valid;
