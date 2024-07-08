@@ -129,14 +129,22 @@ public class CacheOrganismTest {
 
         organism.save(file, "latest", false);
 
-        final CacheOrganism organismLoad = new CacheOrganism(null);
-        organismLoad.load(file, "latest", false);
+        organism.set(KEY_1, VALUE_2);
+        organism.save(file, "backup", false);
 
-        assertEquals(3, organismLoad.scard(KEY_1));
-        assertEquals(VALUE_2, organismLoad.get(KEY_2));
-        assertNull(organismLoad.get(KEY_3));
-        assertTrue(organismLoad.exist(KEY_4));
+        final CacheOrganism organismLatest = new CacheOrganism(null);
+        organismLatest.load(file, "latest", false);
+        assertEquals(3, organismLatest.scard(KEY_1));
+        assertEquals(VALUE_2, organismLatest.get(KEY_2));
+        assertNull(organismLatest.get(KEY_3));
+        assertTrue(organismLatest.exist(KEY_4));
 
+        final CacheOrganism organismBackup = new CacheOrganism(null);
+        organismBackup.load(file, "backup", false);
+        assertEquals(VALUE_2, organismLatest.get(KEY_1));
+        assertEquals(VALUE_2, organismLatest.get(KEY_2));
+        assertNull(organismLatest.get(KEY_3));
+        assertTrue(organismLatest.exist(KEY_4));
     }
 
     @Test

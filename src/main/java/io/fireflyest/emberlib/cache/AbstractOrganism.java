@@ -1,5 +1,7 @@
 package io.fireflyest.emberlib.cache;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -7,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -272,13 +275,28 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
      * @param entryName 压缩内文件名称
      */
     public void save(@Nonnull File file, @Nonnull String entryName, boolean reset) {
+        // 先把全部文件读出到内存
+        final Map<String, byte[]> tempMap = this.readZipFile(file);
+
         try (FileOutputStream fStream = new FileOutputStream(file);
                 ZipOutputStream zStream = new ZipOutputStream(fStream);
                 DataOutputStream dStream = new DataOutputStream(zStream)) {
             
+            zStream.setComment("cache organism");
+
+            for (Entry<String, byte[]> temp : tempMap.entrySet()) {
+                if (temp.getKey().equals(entryName)) { // 保留的是其他文件
+                    continue;
+                }
+                final ByteArrayInputStream byteInStream = new ByteArrayInputStream(temp.getValue());
+                final ZipEntry zipEntry = new ZipEntry(temp.getKey());
+                zStream.putNextEntry(zipEntry);
+                zStream.write(byteInStream.readAllBytes());
+                zStream.closeEntry();
+            }
+            
             final ZipEntry zipEntry = new ZipEntry(entryName);
             zStream.putNextEntry(zipEntry);
-            zStream.setComment("cache organism");
 
             // 缓存迭代器
             final Iterator<Entry<K, AbstractCell<V>>> iterator 
@@ -314,6 +332,51 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
         if (reset) {
             cacheMap.clear();
         }
+    }
+
+    /**
+     * 读取zip文件到内存
+     * @param file 文件
+     * @return 读取结果
+     */
+    private Map<String, byte[]> readZipFile(@Nonnull File file) {
+        final Map<String, byte[]> tempMap = new HashMap<>();
+        if (file.exists()) {
+            try (ZipFile zipFile = new ZipFile(file)) {
+
+                final Enumeration<? extends ZipEntry> entries = zipFile.entries();
+                while (entries.hasMoreElements()) {
+                    final ZipEntry zipEntry = entries.nextElement();
+                    tempMap.put(zipEntry.getName(), this.readZipEntry(zipFile, zipEntry));
+                }
+    
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return tempMap;
+    }
+
+    /**
+     * 读取zip文件中的entry
+     * @param zipFile 压缩文件
+     * @param entry 条目
+     * @return 内存流
+     */
+    private byte[] readZipEntry(@Nonnull ZipFile zipFile, @Nonnull ZipEntry entry) {
+        final ByteArrayOutputStream byteOutStream = 
+            new ByteArrayOutputStream((int) entry.getSize());
+
+        try (InputStream entryInputStream = zipFile.getInputStream(entry);
+                DataInputStream dStream = new DataInputStream(entryInputStream)) {
+            
+            byteOutStream.write(dStream.readAllBytes());
+            byteOutStream.flush();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return byteOutStream.toByteArray();
     }
 
 }
