@@ -41,25 +41,8 @@ public abstract class SimpleCommand extends AbstractCommand
                              Command command, 
                              String label, 
                              String[] args) {
-        boolean valid = false;
-        switch (args.length) {
-            case 0:
-                valid = execute(sender);
-                break;
-            case 1:
-                valid = execute(sender, args[0]);
-                break;
-            case 2:
-                valid = execute(sender, args[0], args[1]);
-                break;
-            case 3:
-                valid = execute(sender, args[0], args[1], args[2]);
-                break;
-            default:
-                valid = execute(sender, args);
-                break;
-        }
-        return valid;
+        
+        return this.executeCommand(sender, args);
     }
 
     @Nullable
@@ -96,6 +79,34 @@ public abstract class SimpleCommand extends AbstractCommand
             command.setTabCompleter(this);
         }
         return this;
+    }
+
+    /**
+     * 执行指令
+     * @param sender 执行者
+     * @param args 参数
+     * @return 执行是否有效
+     */
+    private boolean executeCommand(@Nonnull CommandSender sender, @Nonnull String[] args) {
+        boolean valid = false;
+        switch (args.length) {
+            case 0:
+                valid = execute(sender);
+                break;
+            case 1:
+                valid = execute(sender, args[0]);
+                break;
+            case 2:
+                valid = execute(sender, args[0], args[1]);
+                break;
+            case 3:
+                valid = execute(sender, args[0], args[1], args[2]);
+                break;
+            default:
+                valid = execute(sender, args);
+                break;
+        }
+        return valid;
     }
     
 }

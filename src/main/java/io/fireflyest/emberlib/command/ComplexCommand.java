@@ -61,32 +61,8 @@ public abstract class ComplexCommand extends AbstractCommand
                              Command command, 
                              String label, 
                              String[] args) {
-        boolean valid = false;
-        SubCommand subCommand = null;
-        if (args.length == 0) {
-            valid = execute(sender);
-        } else if ((subCommand = subCommands.get(args[0])) != null) {
-            final String[] subArgs = new String[args.length - 1];
-            System.arraycopy(args, 1, subArgs, 0, args.length - 1);
-            switch (subArgs.length) {
-                case 0:
-                    valid = subCommand.execute(sender);
-                    break;
-                case 1:
-                    valid = subCommand.execute(sender, subArgs[0]);
-                    break;
-                case 2:
-                    valid = subCommand.execute(sender, subArgs[0], subArgs[1]);
-                    break;
-                case 3:
-                    valid = subCommand.execute(sender, subArgs[0], subArgs[1], subArgs[2]);
-                    break;
-                default:
-                    valid = subCommand.execute(sender, subArgs);
-                    break;
-            }
-        }
-        return valid;
+        
+        return this.executeCommand(sender, args);
     }
 
     @Override
@@ -129,6 +105,41 @@ public abstract class ComplexCommand extends AbstractCommand
             command.setTabCompleter(this);
         }
         return this;
+    }
+
+    /**
+     * 执行指令
+     * @param sender 执行者
+     * @param args 参数
+     * @return 执行是否有效
+     */
+    private boolean executeCommand(@Nonnull CommandSender sender, @Nonnull String[] args) {
+        boolean valid = false;
+        SubCommand subCommand = null;
+        if (args.length == 0) {
+            valid = execute(sender);
+        } else if ((subCommand = subCommands.get(args[0])) != null) {
+            final String[] subArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, subArgs, 0, args.length - 1);
+            switch (subArgs.length) {
+                case 0:
+                    valid = subCommand.execute(sender);
+                    break;
+                case 1:
+                    valid = subCommand.execute(sender, subArgs[0]);
+                    break;
+                case 2:
+                    valid = subCommand.execute(sender, subArgs[0], subArgs[1]);
+                    break;
+                case 3:
+                    valid = subCommand.execute(sender, subArgs[0], subArgs[1], subArgs[2]);
+                    break;
+                default:
+                    valid = subCommand.execute(sender, subArgs);
+                    break;
+            }
+        }
+        return valid;
     }
 
 }
