@@ -54,6 +54,21 @@
       <artifactId>log4j-api</artifactId>
       <version>2.12.4</version>
     </dependency>
+    <dependency>
+      <artifactId>asm</artifactId>
+      <groupId>org.ow2.asm</groupId>
+      <version>9.2</version>
+    </dependency>
+    <dependency>
+      <artifactId>asm-tree</artifactId>
+      <groupId>org.ow2.asm</groupId>
+      <version>9.2</version>
+    </dependency>
+    <dependency>
+      <artifactId>asm-commons</artifactId>
+      <groupId>org.ow2.asm</groupId>
+      <version>9.2</version>
+    </dependency>
   </dependencies>
 
 </project>
