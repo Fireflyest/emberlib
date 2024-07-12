@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.Test;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
@@ -24,6 +25,20 @@ import org.objectweb.asm.Type;
  * @since 1.0
  */
 public class PluginConfigTest {
+
+    @Test
+    public void testYaml() {
+        YamlConfiguration yaml = new YamlConfiguration();
+        yaml.addDefault("null", "yamlConfiguration");
+
+        yaml.set("aanull", "yaml");
+        
+
+        System.out.println();
+        System.out.println(yaml.get("null"));
+
+        System.out.println(yaml.saveToString());
+    }
 
     @Test
     public void testRead() {
