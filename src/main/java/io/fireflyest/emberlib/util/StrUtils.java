@@ -1,5 +1,6 @@
 package io.fireflyest.emberlib.util;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -99,6 +100,25 @@ public final class StrUtils {
 
     private StrUtils() {
         // 
+    }
+
+    /**
+     * 正则表达式查询
+     * 
+     * @param pattern 正则表达式的编译表示
+     * @param str 查询的文本来源
+     * @return 查询结果
+     */
+    public static String[] find(@Nonnull Pattern pattern, @Nullable String str) {
+        if (str == null) {
+            return new String[0];
+        }
+        final Matcher matcher = pattern.matcher(str);
+        final List<String> found = new ArrayList<>();
+        while (matcher.find()) {
+            found.add(matcher.group());
+        }
+        return found.toArray(new String[0]);
     }
 
     /**
@@ -212,6 +232,9 @@ public final class StrUtils {
      * @return Base64格式
      */
     public static String base64Encode(String str) {
+        if (str == null) {
+            return str;
+        }
         return Base64.getEncoder().encodeToString(str.getBytes());
     }
 
@@ -222,6 +245,9 @@ public final class StrUtils {
      * @return 普通文本
      */
     public static String base64Decode(String str) {
+        if (str == null) {
+            return str;
+        }
         return new String(Base64.getDecoder().decode(str));
     }
 
