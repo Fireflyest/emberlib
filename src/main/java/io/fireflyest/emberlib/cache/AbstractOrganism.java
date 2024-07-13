@@ -29,7 +29,11 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.plugin.Plugin;
 import com.google.gson.Gson;
 import io.fireflyest.emberlib.cache.api.Organism;
+<<<<<<< HEAD
 import io.fireflyest.emberlib.util.StrUtils;
+=======
+import io.fireflyest.emberlib.util.TextUtils;
+>>>>>>> beta
 import io.fireflyest.emberlib.util.YamlUtils;
 
 /**
@@ -210,7 +214,11 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
     @SuppressWarnings("unchecked")
     @Override
     public K deserializeKey(@Nonnull String keyStr) {
+<<<<<<< HEAD
         keyStr = StrUtils.base64Decode(keyStr);
+=======
+        keyStr = TextUtils.base64Decode(keyStr);
+>>>>>>> beta
         final Type type = ((ParameterizedType) getClass().getGenericSuperclass())
                 .getActualTypeArguments()[0];
         final Class<?> keyClass = (Class<?>) type;
@@ -220,7 +228,11 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
         } else if (ConfigurationSerializable.class.isAssignableFrom(keyClass)) {
             k = (K) YamlUtils.deserialize(keyStr, (Class<ConfigurationSerializable>) keyClass);
         } else {
+<<<<<<< HEAD
             k = StrUtils.jsonToObj(keyStr, (Class<K>) keyClass);
+=======
+            k = TextUtils.jsonToObj(keyStr, (Class<K>) keyClass);
+>>>>>>> beta
         }
         return k;
     }
@@ -228,7 +240,11 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
     @SuppressWarnings("unchecked")
     @Override
     public V deserializeValue(@Nonnull String valueStr) {
+<<<<<<< HEAD
         valueStr = StrUtils.base64Decode(valueStr);
+=======
+        valueStr = TextUtils.base64Decode(valueStr);
+>>>>>>> beta
         final Type type = ((ParameterizedType) getClass().getGenericSuperclass())
                 .getActualTypeArguments()[1];
         final Class<?> valueClass = (Class<?>) type;
@@ -238,7 +254,11 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
         } else if (ConfigurationSerializable.class.isAssignableFrom(valueClass)) {
             v = (V) YamlUtils.deserialize(valueStr, (Class<ConfigurationSerializable>) valueClass);
         } else {
+<<<<<<< HEAD
             v = StrUtils.jsonToObj(valueStr, (Class<V>) valueClass);
+=======
+            v = TextUtils.jsonToObj(valueStr, (Class<V>) valueClass);
+>>>>>>> beta
         }
         return v;
     }
@@ -251,9 +271,15 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
         } else if (key instanceof ConfigurationSerializable) {
             keyString = YamlUtils.serialize((ConfigurationSerializable) key);
         } else {
+<<<<<<< HEAD
             keyString = StrUtils.toJson(key);
         }
         return StrUtils.base64Encode(keyString);
+=======
+            keyString = TextUtils.toJson(key);
+        }
+        return TextUtils.base64Encode(keyString);
+>>>>>>> beta
     }
 
     @Override
@@ -264,9 +290,15 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
         } else if (value instanceof ConfigurationSerializable) {
             valueString = YamlUtils.serialize((ConfigurationSerializable) value);
         } else {
+<<<<<<< HEAD
             valueString = StrUtils.toJson(value);
         }
         return StrUtils.base64Encode(valueString);
+=======
+            valueString = TextUtils.toJson(value);
+        }
+        return TextUtils.base64Encode(valueString);
+>>>>>>> beta
     }
 
     @Override

@@ -13,11 +13,11 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface Config {
+public @interface Yaml {
     
     /**
      * 生成的文件名称
      */
-    String name() default "config";
+    String name() default "config.yml";
 
 }
