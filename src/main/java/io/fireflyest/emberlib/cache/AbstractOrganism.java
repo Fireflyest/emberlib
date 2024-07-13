@@ -28,7 +28,6 @@ import javax.annotation.Nullable;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.plugin.Plugin;
 import com.google.gson.Gson;
-
 import io.fireflyest.emberlib.util.TextUtils;
 import io.fireflyest.emberlib.util.YamlUtils;
 
