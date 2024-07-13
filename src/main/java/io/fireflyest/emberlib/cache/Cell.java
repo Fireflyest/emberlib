@@ -1,4 +1,4 @@
-package io.fireflyest.emberlib.cache.api;
+package io.fireflyest.emberlib.cache;
 
 import java.time.Instant;
 import java.util.Set;
