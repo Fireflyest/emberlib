@@ -15,7 +15,7 @@ import io.fireflyest.emberlib.command.args.Argument;
  * 简单指令
  * 
  * @author Fireflyest
- * @since 
+ * @since 1.0
  */
 public abstract class SimpleCommand extends AbstractCommand 
                                     implements CommandExecutor, TabCompleter {

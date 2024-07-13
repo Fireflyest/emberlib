@@ -115,6 +115,7 @@ public abstract class AbstractCommand {
 
     /**
      * 无参指令
+     * 
      * @param sender 发送者
      * @return 是否正确
      */
@@ -122,6 +123,7 @@ public abstract class AbstractCommand {
 
     /**
      * 单参指令
+     * 
      * @param sender 发送者
      * @param arg1 参数1
      * @return 是否正确
@@ -132,6 +134,7 @@ public abstract class AbstractCommand {
     }
 
     /**
+     * 两参数指令
      * 
      * @param sender 发送者
      * @param arg1 参数1
@@ -145,6 +148,7 @@ public abstract class AbstractCommand {
     }
 
     /**
+     * 三参数指令
      * 
      * @param sender 发送者
      * @param arg1 参数1
@@ -160,6 +164,7 @@ public abstract class AbstractCommand {
     }
 
     /**
+     * 多参数指令
      * 
      * @param sender 发送者
      * @param args 参数
