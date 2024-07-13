@@ -56,6 +56,12 @@ public abstract class SimpleCommand extends AbstractCommand
     }
 
     @Override
+    public SimpleCommand name(String name) {
+        super.name(name);
+        return this;
+    }
+
+    @Override
     public SimpleCommand async() {
         super.async();
         return this;

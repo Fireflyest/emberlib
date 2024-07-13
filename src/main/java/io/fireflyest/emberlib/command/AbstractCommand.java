@@ -69,6 +69,16 @@ public abstract class AbstractCommand {
     }
 
     /**
+     * 设置指令名称
+     * 
+     * @param name 指令名称
+     */
+    public AbstractCommand name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
      * 获取指令的执行方式
      * 
      * @return 是否异步执行

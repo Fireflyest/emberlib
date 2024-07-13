@@ -83,6 +83,12 @@ public abstract class ComplexCommand extends AbstractCommand
     }
 
     @Override
+    public ComplexCommand name(String name) {
+        super.name(name);
+        return this;
+    }
+
+    @Override
     public ComplexCommand async() {
         super.async();
         return this;
@@ -94,8 +100,8 @@ public abstract class ComplexCommand extends AbstractCommand
      * @param subCommand 子指令
      */
     public ComplexCommand addSub(@Nonnull SubCommand subCommand) {
-        final String subCommandName = subCommand.getName();
-        this.subCommands.put(StringUtils.removeStart(subCommandName, this.getName()), subCommand);
+        final String subCommandName = StringUtils.removeStart(subCommand.getName(), this.getName());
+        this.subCommands.put(subCommandName, subCommand.name(subCommandName));
         return this;
     }
 
@@ -107,6 +113,12 @@ public abstract class ComplexCommand extends AbstractCommand
     public ComplexCommand apply(@Nonnull JavaPlugin plugin) {
         this.plugin = plugin;
         final PluginCommand command = plugin.getCommand(this.getName());
+        final String permission = command.getPermission();
+        if (permission != null) {
+            for (SubCommand subCommand : subCommands.values()) {
+                subCommand.permission(permission + "." + subCommand.getName());
+            }
+        }
         if (command != null) {
             command.setExecutor(this);
             command.setTabCompleter(this);

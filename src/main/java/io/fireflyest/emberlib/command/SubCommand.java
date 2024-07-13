@@ -35,8 +35,25 @@ public abstract class SubCommand extends AbstractCommand {
     }
 
     @Override
+    public SubCommand name(String name) {
+        super.name(name);
+        return this;
+    }
+
+    @Override
     public SubCommand async() {
         super.async();
+        return this;
+    }
+
+    /**
+     * 设置权限
+     * 
+     * @param permission 权限
+     * @return 本身
+     */
+    public SubCommand permission(String permission) {
+        this.permission = permission;
         return this;
     }
 
