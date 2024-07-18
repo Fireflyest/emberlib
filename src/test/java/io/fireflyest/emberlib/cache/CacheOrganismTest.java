@@ -214,6 +214,17 @@ public class CacheOrganismTest {
     }
 
     @Test
+    public void testSexist() {
+        final CacheOrganism organism = new CacheOrganism(null);
+        organism.set(KEY_1, VALUE_1);
+        organism.sadd(KEY_1, VALUE_2);
+        assertTrue(organism.sexist(KEY_1, VALUE_1));
+        assertTrue(organism.sexist(KEY_1, VALUE_2));
+        assertFalse(organism.sexist(KEY_1, VALUE_3));
+        assertFalse(organism.sexist(KEY_2, VALUE_3));
+    }
+
+    @Test
     public void testSpop() {
         final CacheOrganism organism = new CacheOrganism(null);
         organism.set(KEY_1, VALUE_1);
