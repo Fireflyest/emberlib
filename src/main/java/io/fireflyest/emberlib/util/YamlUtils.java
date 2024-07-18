@@ -16,9 +16,14 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public final class YamlUtils {
     
+    /**
+     * 数据存储键
+     */
     public static final String DATA_PATH = "data";
 
-    // 缓存解析
+    /**
+     * 配置文件编辑器
+     */
     private static final YamlConfiguration yaml = new YamlConfiguration();
 
     private YamlUtils() {

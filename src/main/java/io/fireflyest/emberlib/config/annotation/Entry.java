@@ -17,6 +17,8 @@ public @interface Entry {
     
     /**
      * 生成的键名称
+     * 
+     * @return 生成的键名称
      */
     String value() default "";
 

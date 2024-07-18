@@ -95,7 +95,15 @@ public final class TextUtils {
      * 用于获取对应变量
      */
     public interface VariableContainer {
+
+        /**
+         * 获取对应键的值
+         * 
+         * @param key 键
+         * @return 值
+         */
         String getVar(String key);
+
     }
 
     private TextUtils() {

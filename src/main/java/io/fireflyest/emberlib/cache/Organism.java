@@ -6,7 +6,8 @@ import javax.annotation.Nullable;
 import org.bukkit.plugin.Plugin;
 
 /**
- * 存储字典
+ * 存储组织接口
+ * 
  * @author Fireflyest
  * @since 1.0
  */
