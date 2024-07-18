@@ -145,6 +145,8 @@ public class CacheOrganismTest {
         assertEquals(VALUE_2, organismLatest.get(KEY_2));
         assertNull(organismLatest.get(KEY_3));
         assertTrue(organismLatest.exist(KEY_4));
+
+        file.delete();
     }
 
     @Test
