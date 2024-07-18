@@ -18,6 +18,6 @@ public @interface Yaml {
     /**
      * 生成的文件名称
      */
-    String name() default "config.yml";
+    String value() default "config.yml";
 
 }
