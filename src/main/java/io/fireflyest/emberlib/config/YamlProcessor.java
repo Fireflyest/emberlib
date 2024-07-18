@@ -8,7 +8,6 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
-
 import org.bukkit.configuration.file.YamlConfiguration;
 
 /**

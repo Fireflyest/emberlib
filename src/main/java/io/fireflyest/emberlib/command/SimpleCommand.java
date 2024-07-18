@@ -85,6 +85,7 @@ public abstract class SimpleCommand extends AbstractCommand
      * 应用到插件
      * 
      * @param plugin 插件
+     * @return 本身
      */
     public SimpleCommand apply(@Nonnull JavaPlugin plugin) {
         this.plugin = plugin;

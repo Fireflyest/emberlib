@@ -27,7 +27,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.plugin.Plugin;
-import com.google.gson.Gson;
 import io.fireflyest.emberlib.util.TextUtils;
 import io.fireflyest.emberlib.util.YamlUtils;
 
@@ -39,10 +38,19 @@ import io.fireflyest.emberlib.util.YamlUtils;
  */
 public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
 
-    protected final Gson gson = new Gson();
-
+    /**
+     * 名称
+     */
     protected final String name;
+
+    /**
+     * 缓存
+     */
     protected final Map<K, AbstractCell<V>> cacheMap;
+
+    /**
+     * 用于随机取数据
+     */
     protected final Random random = new Random();
 
     /**
@@ -302,6 +310,7 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
      * 从文件加载数据到缓存
      * @param file 缓存文件
      * @param entryName 压缩内文件名称
+     * @param reset 加载前重置
      */
     public void load(@Nonnull File file, @Nonnull String entryName, boolean reset) {
         if (reset) {
@@ -353,6 +362,7 @@ public abstract class AbstractOrganism<K, V> implements Organism<K, V> {
      * 保存缓存到文件
      * @param file 缓存文件
      * @param entryName 压缩内文件名称
+     * @param reset 保存后重置
      */
     public void save(@Nonnull File file, @Nonnull String entryName, boolean reset) {
         // 先把全部文件读出到内存

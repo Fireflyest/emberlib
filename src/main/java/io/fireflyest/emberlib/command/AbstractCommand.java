@@ -19,6 +19,9 @@ import io.fireflyest.emberlib.command.args.Argument;
  */
 public abstract class AbstractCommand {
     
+    /**
+     * 最大参数数量
+     */
     protected static final int MAX_ARGS = 5;
 
     /**
@@ -72,6 +75,7 @@ public abstract class AbstractCommand {
      * 设置指令名称
      * 
      * @param name 指令名称
+     * @return 本身
      */
     public AbstractCommand name(String name) {
         this.name = name;
@@ -89,6 +93,8 @@ public abstract class AbstractCommand {
 
     /**
      * 设置指令为异步执行
+     * 
+     * @return 本身
      */
     public AbstractCommand async() {
         this.async = true;
@@ -97,6 +103,8 @@ public abstract class AbstractCommand {
 
     /**
      * 获取参数列表
+     * 
+     * @return 参数列表
      */
     public List<Argument> getArguments() {
         return arguments;
@@ -176,7 +184,9 @@ public abstract class AbstractCommand {
 
     /**
      * 获取参数
+     * 
      * @param index 参数位置
+     * @param sender 发送者
      * @param arg 参数
      * @return 提示列表
      */

@@ -14,9 +14,19 @@ import javax.annotation.Nullable;
  */
 public abstract class AbstractCell<T> implements Cell<T> {
 
+    /**
+     * 起始
+     */
     protected final Instant born;
+
+    /**
+     * 期限
+     */
     protected Instant deadline;
 
+    /**
+     * 数据集合
+     */
     protected final Set<T> valueSet;
 
     /**

@@ -98,6 +98,7 @@ public abstract class ComplexCommand extends AbstractCommand
      * 添加子指令
      * 
      * @param subCommand 子指令
+     * @return 本身
      */
     public ComplexCommand addSub(@Nonnull SubCommand subCommand) {
         final String subCommandName = StringUtils.removeStart(subCommand.getName(), this.getName());
@@ -109,6 +110,7 @@ public abstract class ComplexCommand extends AbstractCommand
      * 应用到插件
      * 
      * @param plugin 插件
+     * @return 本身
      */
     public ComplexCommand apply(@Nonnull JavaPlugin plugin) {
         this.plugin = plugin;
