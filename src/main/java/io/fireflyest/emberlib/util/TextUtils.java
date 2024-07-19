@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.util.NumberConversions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -42,54 +43,14 @@ public final class TextUtils {
     public static final Pattern CASE_BORDER_LETTER = Pattern.compile("(?<=[a-z])[A-Z]");
     
     /**
-     * 用于识别被分割的单词
+     * 纯文本
      */
-    public static final Pattern SPLIT_WORDS = Pattern.compile("[a-zA-Z0-9]+");
+    public static final Pattern PURE_TEXT = Pattern.compile("[a-zA-Z0-9]+");
 
     /**
-     * 判断是否纯文本
+     * 完整的纯文本
      */
-    public static final Pattern PURE_TEXT = Pattern.compile("^[a-zA-Z0-9]+$");
-
-    /**
-     * 小驼峰
-     */
-    public static final String CAMEL = "camelCamel";
-
-    /**
-     * 常量
-     */
-    public static final String CONSTANT = "CONSTANT_CONSTANT";
-
-    /**
-     * 点分割
-     */
-    public static final String DOT = "dot.dot";
-
-    /**
-     * 大驼峰
-     */
-    public static final String PASCAL = "PascalPascal";
-
-    /**
-     * 路径
-     */
-    public static final String PATH = "path\\path";
-
-    /**
-     * 句子
-     */
-    public static final String SENTENCE = "sentence sentence";
-
-    /**
-     * 下划线分割
-     */
-    public static final String SNAKE = "snake_snake";
-
-    /**
-     * 标题
-     */
-    public static final String TITLE = "Title Title";
+    public static final Pattern COMPLETE_PURE_TEXT = Pattern.compile("^[a-zA-Z0-9]+$");
 
     /**
      * 用于获取对应变量
@@ -286,56 +247,77 @@ public final class TextUtils {
     }
 
     /**
-     * 其他格式转为句子格式
-     * @param str 文本
-     * @param formType 原格式
-     * @return 句子格式文本
+     * 转为小驼峰
+     * 
+     * @param str 原文本
+     * @return 小驼峰文本
      */
-    public static String toSentence(@Nullable String str, @Nonnull String formType) {
-        if (str == null || str.isEmpty()) {
+    public static String toCamel(@Nullable String str) {
+        if (StringUtils.isEmpty(str)) {
             return str;
         }
-        switch (formType) {
-            case CAMEL:
-            case PASCAL:
-                // 大小驼峰按大小写变化分割
-                return varReplace(CASE_BORDER_LETTER, str, 0, 0, key -> " " + key.toLowerCase());
-            case CONSTANT:
-            case DOT:
-            case PATH:
-            case SNAKE:
-            case TITLE:
-            default:
-                // 其他用符号分割的
-                final Matcher wordMatcher = SPLIT_WORDS.matcher(str);
-                final StringBuilder stringBuilder = new StringBuilder();
-                boolean first = true;
-                while (wordMatcher.find()) {
-                    if (!first) {
-                        stringBuilder.append(" ");
-                    }
-                    stringBuilder.append(wordMatcher.group().toLowerCase());
-                    first = false;
-                }
-                return stringBuilder.toString();
+        final Matcher wordMatcher = PURE_TEXT.matcher(str);
+        final StringBuilder stringBuilder = new StringBuilder();
+        while (wordMatcher.find()) {
+            stringBuilder.append(upperFirst(wordMatcher.group()));
         }
+        return stringBuilder.toString();
     }
 
     /**
-     * 其他格式转为句子格式
-     * @param str 文本
-     * @return 句子格式文本
+     * 分割驼峰
+     * 
+     * @param str 驼峰文本
+     * @param delimiter 分隔符
+     * @return 分割后的文本
      */
-    public static String toSentence(@Nullable String str) {
-        if (str == null || str.isEmpty()) {
+    public static String camelSplit(@Nullable String str, @Nonnull String delimiter) {
+        if (StringUtils.isEmpty(str)) {
             return str;
         }
-        // 驼峰是纯文本
-        if (PURE_TEXT.matcher(str).matches()) {
-            return toSentence(str, CAMEL);
-        }
-        // 其他用符号分割
-        return toSentence(str, "");
+        return varReplace(CASE_BORDER_LETTER, str, 0, 0, key -> delimiter + key.toLowerCase());
     }
+
+    /**
+     * 分割驼峰
+     * 
+     * @param str 驼峰文本
+     * @return 分割后的文本
+     */
+    public static String camelSplit(@Nullable String str) {
+        return camelSplit(str, " ");
+    }
+
+    /**
+     * 按符号分割
+     * 
+     * @param str 带符号文本
+     * @param delimiter 分隔符
+     * @return 分割后的文本
+     */
+    public static String symbolSplit(@Nullable String str, @Nonnull String delimiter) {
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        }
+        final Matcher wordMatcher = PURE_TEXT.matcher(str);
+        final StringBuilder stringBuilder = new StringBuilder();
+        while (wordMatcher.find()) {
+            stringBuilder.append(delimiter)
+                         .append(wordMatcher.group());
+        }
+        return StringUtils.removeStart(stringBuilder.toString(), delimiter);
+    }
+
+    /**
+     * 按符号分割
+     * 
+     * @param str 带符号文本
+     * @return 分割后的文本
+     */
+    public static String symbolSplit(@Nullable String str) {
+        return symbolSplit(str, " ");
+    }
+
+
 
 }
