@@ -10,11 +10,19 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @since 1.0
  */
 public abstract class AbstractConfig {
-    
+
+    /**
+     * 抽象配置类构造函数
+     */
     protected AbstractConfig() {
         
     }
 
+    /**
+     * 加载数据到类
+     * 
+     * @param plugin 插件
+     */
     public static void loadFromYaml(@Nonnull JavaPlugin plugin) {
 
     }
