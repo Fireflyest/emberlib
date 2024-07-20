@@ -45,6 +45,7 @@ public class YamlGenerator extends ElementScanner8<Void, Void> {
     /**
      * 生成器构造
      * 
+     * @param processingEnv 处理环境
      * @param element 被注释的类元素
      * @param targetFile 保存文件路径
      */

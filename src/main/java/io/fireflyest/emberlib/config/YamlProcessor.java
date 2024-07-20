@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import com.google.auto.service.AutoService;
+
 import io.fireflyest.emberlib.config.annotation.Yaml;
 
 /**
@@ -21,6 +23,12 @@ import io.fireflyest.emberlib.config.annotation.Yaml;
 @AutoService(Processor.class)
 @SupportedAnnotationTypes("io.fireflyest.emberlib.config.annotation.Yaml")
 public class YamlProcessor extends AbstractProcessor {
+
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+        // JavacTrees.instance(processingEnv);
+    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -46,8 +54,6 @@ public class YamlProcessor extends AbstractProcessor {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // JavacTrees.instance(processingEnv);
     }
     
 }
