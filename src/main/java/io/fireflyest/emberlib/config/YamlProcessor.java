@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import com.google.auto.service.AutoService;
 import io.fireflyest.emberlib.config.annotation.Yaml;
 
 /**
@@ -16,6 +18,7 @@ import io.fireflyest.emberlib.config.annotation.Yaml;
  * @author Fireflyest
  * @since 1.0
  */
+@AutoService(Processor.class)
 @SupportedAnnotationTypes("io.fireflyest.emberlib.config.annotation.Yaml")
 public class YamlProcessor extends AbstractProcessor {
 
