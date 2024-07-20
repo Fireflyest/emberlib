@@ -243,7 +243,7 @@ public final class TextUtils {
         if (str == null || str.isEmpty()) {
             return str;
         }
-        return Character.toUpperCase(str.charAt(0)) + str.substring(1).toLowerCase();
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 
     /**
@@ -259,7 +259,7 @@ public final class TextUtils {
         final Matcher wordMatcher = PURE_TEXT.matcher(str);
         final StringBuilder stringBuilder = new StringBuilder();
         while (wordMatcher.find()) {
-            stringBuilder.append(upperFirst(wordMatcher.group()));
+            stringBuilder.append(upperFirst(wordMatcher.group().toLowerCase()));
         }
         return stringBuilder.toString();
     }

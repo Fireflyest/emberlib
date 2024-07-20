@@ -1,6 +1,7 @@
 package io.fireflyest.emberlib.util;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import javax.annotation.Nonnull;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -8,6 +9,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import io.fireflyest.emberlib.config.annotation.Entry;
+import io.fireflyest.emberlib.config.annotation.Yaml;
 
 /**
  * 配置文件工具类
@@ -107,6 +110,38 @@ public final class YamlUtils {
             plugin.saveResource(child, false);
         }
         return YamlConfiguration.loadConfiguration(file);
+    }
+
+    /**
+     * 把数据加载到类
+     * 
+     * @param plugin 插件
+     * @param theClass 配置类
+     */
+    public static void loadToClass(@Nonnull JavaPlugin plugin, @Nonnull Class<?> theClass) {
+        final Yaml yaml = theClass.getAnnotation(Yaml.class);
+        if (yaml != null) {
+            final FileConfiguration yamlFile = loadYaml(plugin, yaml.value());
+            for (Field field : theClass.getDeclaredFields()) {
+                final Entry entry = field.getAnnotation(Entry.class);
+                if (entry != null) {
+                    final String key = "".equals(entry.value()) ? defaultKey(field) : entry.value();
+                    ReflectionUtils.setField(field, null, yamlFile.get(key));
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取变量的默认生成键
+     * 
+     * @param variableElement 变量元素
+     * @return 默认生成键
+     */
+    private static String defaultKey(Field field) {
+        return TextUtils.symbolSplit(
+            field.getName().toLowerCase(), "."
+        );
     }
 
 }
