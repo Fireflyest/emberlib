@@ -97,6 +97,21 @@
       <artifactId>auto-service</artifactId>
       <version>1.0-rc5</version>
     </dependency>
+        <dependency>
+      <artifactId>asm</artifactId>
+      <groupId>org.ow2.asm</groupId>
+      <version>9.2</version>
+    </dependency>
+    <dependency>
+      <artifactId>asm-tree</artifactId>
+      <groupId>org.ow2.asm</groupId>
+      <version>9.2</version>
+    </dependency>
+    <dependency>
+      <artifactId>asm-commons</artifactId>
+      <groupId>org.ow2.asm</groupId>
+      <version>9.2</version>
+    </dependency>
   </dependencies>
 
 </project>
