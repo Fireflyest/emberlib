@@ -9,12 +9,12 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Fireflyest
  * @since 1.0
  */
-public abstract class AbstractConfig {
+public abstract class AbstractYaml {
 
     /**
      * 抽象配置类构造函数
      */
-    protected AbstractConfig() {
+    protected AbstractYaml() {
         
     }
 
