@@ -18,18 +18,33 @@
           <configuration>
             <source>${java.version}</source>
             <target>${java.version}</target>
+            <showWarnings>true</showWarnings> 
+            <fork>true</fork>
+            <compilerArgs>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+              <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+            </compilerArgs>
           </configuration>
       </plugin>
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.6.2</version>
           <configuration>
               <encoding>${project.build.sourceEncoding}</encoding>
-              <aggregate>true</aggregate>
               <charset>${project.build.sourceEncoding}</charset>
+              <aggregate>true</aggregate>
               <source>${java.version}</source>
               <docencoding>UTF-8</docencoding>
+              <skip>true</skip> 
           </configuration>
           <executions>
               <execution>
