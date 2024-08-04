@@ -1,4 +1,4 @@
 name: ${project.name}
 version: '${project.version}'
-main: io.fireflyest.spigot.emberlib.EmberLib
+main: io.fireflyest.emberlib.EmberLib
 api-version: '1.18'
