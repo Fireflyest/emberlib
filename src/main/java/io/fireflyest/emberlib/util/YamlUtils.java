@@ -125,7 +125,8 @@ public final class YamlUtils {
             for (Field field : theClass.getDeclaredFields()) {
                 final Entry entry = field.getAnnotation(Entry.class);
                 if (entry != null) {
-                    final String key = "".equals(entry.value()) ? defaultKey(field) : entry.value();
+                    final String key = "".equals(entry.value()) 
+                        ? defaultKey(field.getName()) : entry.value();
                     ReflectionUtils.setField(field, null, yamlFile.get(key));
                 }
             }
@@ -135,12 +136,12 @@ public final class YamlUtils {
     /**
      * 获取变量的默认生成键
      * 
-     * @param variableElement 变量元素
+     * @param fieldName 变量元素
      * @return 默认生成键
      */
-    private static String defaultKey(Field field) {
+    public static String defaultKey(String fieldName) {
         return TextUtils.symbolSplit(
-            field.getName().toLowerCase(), "."
+            fieldName.toLowerCase(), "."
         );
     }
 

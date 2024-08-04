@@ -19,14 +19,12 @@ public final class EmberLib extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-        this.getLogger().info("enable!");
+        Print.EMBER_LIB.info("enable");
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-        this.getLogger().info("disable!");
+        
     }
 
 }
