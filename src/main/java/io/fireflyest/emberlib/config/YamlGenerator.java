@@ -72,9 +72,13 @@ public class YamlGenerator extends ElementScanner8<Void, Void> {
                 key = YamlUtils.defaultKey(varElement.getSimpleName().toString());
             }
             // 配置文件内设置值及其注释
-            yaml.set(key, varElement.getConstantValue());
-            if (comments != null) {
-                yaml.setComments(key, Arrays.asList(comments.value()));
+            final Object boxValue = varElement.getConstantValue();
+            if (boxValue instanceof YamlConfig.Box) {
+                final YamlConfig.Box<?> box = ((YamlConfig.Box<?>) boxValue);
+                yaml.set(key, box.get());
+                if (comments != null) {
+                    yaml.setComments(key, Arrays.asList(comments.value()));
+                }
             }
         }
         return null;
