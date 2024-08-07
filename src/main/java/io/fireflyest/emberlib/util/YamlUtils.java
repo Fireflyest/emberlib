@@ -4,10 +4,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import javax.annotation.Nonnull;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -135,8 +132,7 @@ public final class YamlUtils {
                    SecurityException, 
                    IllegalAccessException, 
                    IllegalArgumentException, 
-                   InvocationTargetException, 
-                   ClassNotFoundException {
+                   InvocationTargetException {
 
         final Yaml yaml = theClass.getAnnotation(Yaml.class);
         if (yaml == null) {
@@ -148,16 +144,10 @@ public final class YamlUtils {
             if (entry == null) { // 没注释的不管
                 continue;
             }
-            final Type gt = field.getGenericType();
-            if (gt instanceof ParameterizedType) {
-                final ParameterizedType pt = (ParameterizedType) gt;
-                final String vt = pt.getActualTypeArguments()[0].getTypeName();
-                final Class<?> valueClass = Class.forName(vt);
-                final Method set = YamlValue.class.getDeclaredMethod("set", valueClass);
-                final String key = "".equals(entry.value()) 
-                    ? defaultKey(field.getName()) : entry.value();
-                set.invoke(field.get(null), yamlFile.get(key));
-            }
+            final Method set = YamlValue.class.getDeclaredMethod("set", Object.class);
+            final String key = "".equals(entry.value()) 
+                ? defaultKey(field.getName()) : entry.value();
+            set.invoke(field.get(null), yamlFile.get(key));
         }
     }
 
