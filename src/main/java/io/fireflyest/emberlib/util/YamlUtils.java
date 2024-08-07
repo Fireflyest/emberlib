@@ -152,7 +152,7 @@ public final class YamlUtils {
             if (gt instanceof ParameterizedType) {
                 final ParameterizedType pt = (ParameterizedType) gt;
                 final String vt = pt.getActualTypeArguments()[0].getTypeName();
-                final Class<?> valueClass = Class.forName(StringUtils.split(vt, ' ')[1]);
+                final Class<?> valueClass = Class.forName(vt);
                 final Method set = YamlValue.class.getDeclaredMethod("set", valueClass);
                 final String key = "".equals(entry.value()) 
                     ? defaultKey(field.getName()) : entry.value();
