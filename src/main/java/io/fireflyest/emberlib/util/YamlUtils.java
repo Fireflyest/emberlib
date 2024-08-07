@@ -2,13 +2,22 @@ package io.fireflyest.emberlib.util;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import javax.annotation.Nonnull;
+
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import io.fireflyest.emberlib.config.YamlConfig;
 import io.fireflyest.emberlib.config.annotation.Entry;
 import io.fireflyest.emberlib.config.annotation.Yaml;
 
@@ -117,18 +126,41 @@ public final class YamlUtils {
      * 
      * @param plugin 插件
      * @param theClass 配置类
+     * @throws SecurityException 非法访问
+     * @throws NoSuchMethodException 方法未找到
+     * @throws InvocationTargetException 执行目标不是数据盒
+     * @throws IllegalArgumentException 非法参数
+     * @throws IllegalAccessException 非法访问
+     * @throws ClassNotFoundException 未找到类
      */
-    public static void loadToClass(@Nonnull JavaPlugin plugin, @Nonnull Class<?> theClass) {
+    public static void loadToClass(@Nonnull JavaPlugin plugin, @Nonnull Class<?> theClass) 
+            throws NoSuchMethodException, 
+                   SecurityException, 
+                   IllegalAccessException, 
+                   IllegalArgumentException, 
+                   InvocationTargetException, 
+                   ClassNotFoundException {
+
         final Yaml yaml = theClass.getAnnotation(Yaml.class);
-        if (yaml != null) {
-            final FileConfiguration yamlFile = loadYaml(plugin, yaml.value());
-            for (Field field : theClass.getDeclaredFields()) {
-                final Entry entry = field.getAnnotation(Entry.class);
-                if (entry != null) {
-                    final String key = "".equals(entry.value()) 
-                        ? defaultKey(field.getName()) : entry.value();
-                    ReflectionUtils.setField(field, null, yamlFile.get(key));
-                }
+        if (yaml == null) { // 没注释的不管
+            return;
+        }
+        final FileConfiguration yamlFile = loadYaml(plugin, yaml.value());
+        for (Field field : theClass.getDeclaredFields()) {
+            final Entry entry = field.getAnnotation(Entry.class);
+            if (entry == null) { // 没注释的不管
+                continue;
+            }
+            Method set = null;
+            final Type gt = field.getGenericType();
+            if (gt instanceof ParameterizedType) {
+                final ParameterizedType pt = (ParameterizedType) gt;
+                final String vt = pt.getActualTypeArguments()[0].getTypeName();
+                final Class<?> valueClass = Class.forName(StringUtils.split(vt, ' ')[1]);
+                set = YamlConfig.Box.class.getDeclaredMethod("set", valueClass);
+                final String key = "".equals(entry.value()) 
+                    ? defaultKey(field.getName()) : entry.value();
+                set.invoke(field.get(null), yamlFile.get(key));
             }
         }
     }
