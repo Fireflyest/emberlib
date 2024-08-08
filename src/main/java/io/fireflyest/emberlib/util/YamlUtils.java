@@ -1,11 +1,13 @@
 package io.fireflyest.emberlib.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.annotation.Nonnull;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -120,34 +122,41 @@ public final class YamlUtils {
      * 
      * @param plugin 插件
      * @param theClass 配置类
-     * @throws SecurityException 非法访问
-     * @throws NoSuchMethodException 方法未找到
-     * @throws InvocationTargetException 执行目标不是数据盒
-     * @throws IllegalArgumentException 非法参数
-     * @throws IllegalAccessException 非法访问
-     * @throws ClassNotFoundException 未找到类
      */
-    public static void loadToClass(@Nonnull JavaPlugin plugin, @Nonnull Class<?> theClass) 
-            throws NoSuchMethodException, 
-                   SecurityException, 
-                   IllegalAccessException, 
-                   IllegalArgumentException, 
-                   InvocationTargetException {
-
+    public static void loadToClass(@Nonnull JavaPlugin plugin, @Nonnull Class<?> theClass) {
         final Yaml yaml = theClass.getAnnotation(Yaml.class);
-        if (yaml == null) {
+        if (yaml == null) { // 没注释的不管
             return;
         }
         final FileConfiguration yamlFile = loadYaml(plugin, yaml.value());
-        for (Field field : theClass.getDeclaredFields()) {
-            final Entry entry = field.getAnnotation(Entry.class);
-            if (entry == null) { // 没注释的不管
-                continue;
+        try {
+            for (Field field : theClass.getDeclaredFields()) {
+                final Entry entry = field.getAnnotation(Entry.class);
+                if (entry == null) { // 没注释的不管
+                    continue;
+                }
+                final String key = "".equals(entry.value()) 
+                    ? defaultKey(field.getName()) : entry.value();
+                final Object value = yamlFile.get(key);
+                if (value instanceof MemorySection) {
+                    final Method get = YamlValue.class.getDeclaredMethod("get");
+                    yamlFile.set(key, get.invoke(field.get(null)));
+                } else {
+                    final Method set = YamlValue.class.getDeclaredMethod("set", Object.class);
+                    set.invoke(field.get(null), value);
+                }
             }
-            final Method set = YamlValue.class.getDeclaredMethod("set", Object.class);
-            final String key = "".equals(entry.value()) 
-                ? defaultKey(field.getName()) : entry.value();
-            set.invoke(field.get(null), yamlFile.get(key));
+        } catch (NoSuchMethodException | SecurityException 
+                                       | IllegalAccessException 
+                                       | IllegalArgumentException 
+                                       | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        // 保存文件
+        try {
+            yamlFile.save(new File(plugin.getDataFolder(), yaml.value()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

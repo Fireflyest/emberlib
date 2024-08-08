@@ -12,7 +12,8 @@ import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import org.bukkit.configuration.file.YamlConfiguration;
 import io.fireflyest.emberlib.config.annotation.Entry;
-import io.fireflyest.emberlib.config.annotation.EntryComments;
+import io.fireflyest.emberlib.config.annotation.InlineComments;
+import io.fireflyest.emberlib.config.annotation.Comments;
 import io.fireflyest.emberlib.util.YamlUtils;
 
 /**
@@ -64,7 +65,8 @@ public class YamlGenerator extends ElementScanner8<Void, Void> {
     @Override
     public Void visitVariable(VariableElement varElement, Void p) {
         final Entry entry = varElement.getAnnotation(Entry.class);
-        final EntryComments comments = varElement.getAnnotation(EntryComments.class);
+        final Comments comments = varElement.getAnnotation(Comments.class);
+        final InlineComments inlineComments = varElement.getAnnotation(InlineComments.class);
         if (entry != null) {
             // 键
             String key = entry.value();
@@ -72,13 +74,12 @@ public class YamlGenerator extends ElementScanner8<Void, Void> {
                 key = YamlUtils.defaultKey(varElement.getSimpleName().toString());
             }
             // 配置文件内设置值及其注释
-            final Object boxValue = varElement.getConstantValue();
-            if (boxValue instanceof YamlValue) {
-                final YamlValue<?> box = ((YamlValue<?>) boxValue);
-                yaml.set(key, box.get());
-                if (comments != null) {
-                    yaml.setComments(key, Arrays.asList(comments.value()));
-                }
+            yaml.createSection(key);
+            if (comments != null) {
+                yaml.setComments(key, Arrays.asList(comments.value()));
+            }
+            if (inlineComments != null) {
+                yaml.setInlineComments(key, Arrays.asList(inlineComments.value()));
             }
         }
         return null;
