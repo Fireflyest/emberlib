@@ -128,6 +128,7 @@ public final class YamlUtils {
         if (yaml == null) { // 没注释的不管
             return;
         }
+        boolean saveYamlFile = false;
         final FileConfiguration yamlFile = loadYaml(plugin, yaml.value());
         try {
             for (Field field : theClass.getDeclaredFields()) {
@@ -138,7 +139,8 @@ public final class YamlUtils {
                 final String key = "".equals(entry.value()) 
                     ? defaultKey(field.getName()) : entry.value();
                 final Object value = yamlFile.get(key);
-                if (value instanceof MemorySection) {
+                if (value == null || value instanceof MemorySection) {
+                    saveYamlFile = true;
                     final Method get = YamlValue.class.getDeclaredMethod("get");
                     yamlFile.set(key, get.invoke(field.get(null)));
                 } else {
@@ -153,10 +155,12 @@ public final class YamlUtils {
             e.printStackTrace();
         }
         // 保存文件
-        try {
-            yamlFile.save(new File(plugin.getDataFolder(), yaml.value()));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (saveYamlFile) {
+            try {
+                yamlFile.save(new File(plugin.getDataFolder(), yaml.value()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
