@@ -2,6 +2,7 @@ package io.fireflyest.emberlib.config;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -52,7 +53,7 @@ public class YamlGenerator extends ElementScanner8<Void, Void> {
     public void generate() throws IOException {
         // 加空行
         for (String key : yaml.getKeys(false)) {
-            final List<String> comments = yaml.getComments(key);
+            final List<String> comments = new ArrayList<>(yaml.getComments(key));
             comments.add(0, null);
             yaml.setComments(key, comments);
         }
