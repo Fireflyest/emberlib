@@ -385,19 +385,14 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
         final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
         final String returnType = methodBlock.getReturnType();
         final boolean voidReturn = void.class.getSimpleName().equals(methodBlock.getReturnType());
-        final String resource;
-        if (voidReturn) {
-            resource = "PreparedStatement preparedStatement"
-                + " = databaseConnection.prepareStatement(sqlInsert)";
-        } else { // TODO: 未测试
-            resource = "PreparedStatement preparedStatement = "
-                + "databaseConnection.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);"
-                + "ResultSet resultSet = preparedStatement.getGeneratedKeys()";
-        }
+        final String resource = "PreparedStatement preparedStatement"
+            + " = databaseConnection.prepareStatement(sqlInsert" 
+            + (voidReturn ? "" : ", Statement.RETURN_GENERATED_KEYS") + ")";
         final IfElseBlock ifBlock = new IfElseBlock(CONDITION_RESULT_NEXT)
             .addLine("insertId = resultSet.get" + TextUtils.upperFirst(returnType) + "(1);");
         final TryBlock tryBlock = new TryBlock(resource)
             .addLine("preparedStatement.executeUpdate();")
+            .addLine("ResultSet resultSet = preparedStatement.getGeneratedKeys();", !voidReturn)
             .addBlock(ifBlock, !voidReturn)
             .addLine("return insertId;", !voidReturn)
             .addCatch(SQL_EXCEPTION)
