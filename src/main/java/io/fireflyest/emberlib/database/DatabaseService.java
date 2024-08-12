@@ -74,7 +74,7 @@ public abstract class DatabaseService {
                 final String sql = TextUtils.varReplace(
                     TextUtils.BRACE_PATTERN, 
                     ((String) sqlField.get(null)), 
-                    0, 0, 
+                    2, 1, 
                     key -> url.contains("sqlite") ? sqliteType(key) : mysqlType(key)
                 );
                 this.execute(sql);
