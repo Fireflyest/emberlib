@@ -65,6 +65,7 @@ public abstract class DatabaseService {
             final Class<?> daoImplClass = 
                 Class.forName(daoClass.getPackageName() + "." + daoClass.getSimpleName() + "Impl");
             final Constructor<?> constructor = daoImplClass.getDeclaredConstructor(String.class);
+            ReflectionUtils.makeAccessible(daoField);
             ReflectionUtils.setField(daoField, this, constructor.newInstance(url));
             // 判断是否建表
             if (serviceAnnotation.createTable()) {
