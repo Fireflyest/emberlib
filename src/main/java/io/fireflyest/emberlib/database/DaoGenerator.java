@@ -177,23 +177,6 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
      * @return 替换容器
      */
     private String varReplace(@Nonnull String sql, @Nonnull Map<String, String> parameterTypeMap) {
-        // 默认指令
-        switch (sql) {
-            case "SELECT":
-                
-                break;
-            case "INSERT":
-                
-                break;
-            case "UPDATE":
-                
-                break;
-            case "DELETE":
-                
-                break;
-            default:
-                break;
-        }
         // 参数替换
         return TextUtils.varReplace(
             TextUtils.BRACE_PATTERN, 
@@ -238,7 +221,7 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
         final String warpTypeSingle = this.warpType(returnTypeSingle);
         final boolean beanReturn = returnTypeSingle.equals(source.simplifyType(tableClassName));
         final String selections = StringUtils.remove(TextUtils.find(SELECT_PATTERN, sql)[0], '`');
-        final String resource = "Statement statement = databaseConnection.createStatement();"
+        final String resource = "Statement statement = databaseConnection.createStatement(); "
             + "ResultSet resultSet = statement.executeQuery(sqlSelect)";
 
         // 函数名不同替换一下
@@ -387,13 +370,14 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
         final boolean voidReturn = void.class.getSimpleName().equals(methodBlock.getReturnType());
         final String resource = "PreparedStatement preparedStatement"
             + " = databaseConnection.prepareStatement(sqlInsert" 
-            + (voidReturn ? "" : ", Statement.RETURN_GENERATED_KEYS") + ")";
+            + (voidReturn ? ")" : ", Statement.RETURN_GENERATED_KEYS)");
         final IfElseBlock ifBlock = new IfElseBlock(CONDITION_RESULT_NEXT)
             .addLine("insertId = resultSet.get" + TextUtils.upperFirst(returnType) + "(1);");
         final TryBlock tryBlock = new TryBlock(resource)
             .addLine("preparedStatement.executeUpdate();")
             .addLine("ResultSet resultSet = preparedStatement.getGeneratedKeys();", !voidReturn)
             .addBlock(ifBlock, !voidReturn)
+            .addLine("resultSet.close();", !voidReturn)
             .addLine("return insertId;", !voidReturn)
             .addCatch(SQL_EXCEPTION)
             .addLine(PRINT_STACK_TRACE);
