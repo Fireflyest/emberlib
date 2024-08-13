@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -32,6 +33,11 @@ import io.fireflyest.emberlib.database.code.SourceBlock;
 import io.fireflyest.emberlib.database.code.SourceBuilder;
 import io.fireflyest.emberlib.database.code.TryBlock;
 import io.fireflyest.emberlib.database.sql.CreateTableBuilder;
+import io.fireflyest.emberlib.database.sql.DeleteBuilder;
+import io.fireflyest.emberlib.database.sql.InsertBuilder;
+import io.fireflyest.emberlib.database.sql.SelectBuilder;
+import io.fireflyest.emberlib.database.sql.UpdateBuilder;
+import io.fireflyest.emberlib.database.sql.WhereBuilder;
 import io.fireflyest.emberlib.util.TextUtils;
 
 /**
@@ -213,13 +219,16 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
      * @param methodBlock 方法块
      */
     private void codeSelect(@Nonnull String sql, @Nonnull MethodBlock methodBlock) {
-        final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
         final String returnType = methodBlock.getReturnType();
         final boolean arrayReturn = StringUtils.endsWith(returnType, "[]");
         final String returnTypeSingle = arrayReturn 
             ? StringUtils.removeEnd(returnType, "[]") : returnType;
         final String warpTypeSingle = this.warpType(returnTypeSingle);
         final boolean beanReturn = returnTypeSingle.equals(source.simplifyType(tableClassName));
+        if ("SELECT".equals(sql)) {
+            sql = this.defaultSelect(methodBlock.getParameterMap(), arrayReturn, beanReturn);
+        }
+        final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
         final String selections = StringUtils.remove(TextUtils.find(SELECT_PATTERN, sql)[0], '`');
         final String resource = "Statement statement = databaseConnection.createStatement(); "
             + "ResultSet resultSet = statement.executeQuery(sqlSelect)";
@@ -365,9 +374,12 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
      * @param methodBlock 方法块
      */
     private void codeInsert(@Nonnull String sql, @Nonnull MethodBlock methodBlock) {
-        final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
         final String returnType = methodBlock.getReturnType();
         final boolean voidReturn = void.class.getSimpleName().equals(methodBlock.getReturnType());
+        if ("INSERT".equals(sql)) {
+            sql = this.defaultInsert(methodBlock.getParameterMap());
+        }
+        final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
         final String resource = "PreparedStatement preparedStatement"
             + " = databaseConnection.prepareStatement(sqlInsert" 
             + (voidReturn ? ")" : ", Statement.RETURN_GENERATED_KEYS)");
@@ -398,14 +410,18 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
      * @param methodBlock 方法块
      */
     private void codeUpdate(@Nonnull String sql, @Nonnull MethodBlock methodBlock) {
-        final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
         final boolean voidReturn = void.class.getSimpleName().equals(methodBlock.getReturnType());
+        if ("UPDATE".equals(sql)) {
+            sql = this.defaultUpdate(methodBlock.getParameterMap());
+        } else if ("DELETE".equals(sql)) {
+            sql = this.defaultDelete(methodBlock.getParameterMap());
+        }
+        final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
         final String resource = 
             "PreparedStatement preparedStatement = databaseConnection.prepareStatement(sqlUpdate)";
         final TryBlock tryBlock = new TryBlock(resource)
             .addLine("preparedStatement.executeUpdate();", voidReturn)
-            .addLine("updateDataCount = preparedStatement.executeUpdate();", !voidReturn)
-            .addLine("return updateDataCount;", !voidReturn)
+            .addLine("return preparedStatement.executeUpdate();", !voidReturn)
             .addCatch(SQL_EXCEPTION)
             .addLine(PRINT_STACK_TRACE);
 
@@ -413,9 +429,107 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
             .addLine("final String sqlUpdate = ")
             .addLine(SourceBuilder.INDENT + "\"" + sqlReplaced + "\";")
             .addLine(CONNECTION_LINE)
-            .addLine(methodBlock.getReturnType() + " updateDataCount = 0;", !voidReturn)
             .addBlock(tryBlock)
-            .addLine("return updateDataCount;", !voidReturn);
+            .addLine("return 0;", !voidReturn);
+    }
+
+    /**
+     * 默认查询指令
+     * 
+     * @param parameterTypeMap 参数
+     * @param arrayReturn 返回集合
+     * @param beanReturn 返回完整数据对象
+     * @return 默认查询指令
+     */
+    private String defaultSelect(@Nonnull Map<String, String> parameterTypeMap, 
+                                 boolean arrayReturn, 
+                                 boolean beanReturn) {
+        final String selections = beanReturn ? "*" : "COUNT(*)";
+        final WhereBuilder whereBuilder = new WhereBuilder();
+        final SelectBuilder selectBuilder = new SelectBuilder(selections, tableInfo.getTableName());
+        for (Entry<String, String> entry : parameterTypeMap.entrySet()) {
+            final ColumnInfo columnInfo = tableInfo.getColumnInfo(entry.getKey());
+            if (columnInfo != null) {
+                String value = "${" + entry.getKey() + "}";
+                if (String.class.getSimpleName().equals(entry.getValue())) {
+                    value = "'" + value + "'";
+                }
+                whereBuilder.equalTo(columnInfo.getColumnName(), value);
+            }
+        }
+        if (!arrayReturn) {
+            selectBuilder.limit(1);
+        }
+        return selectBuilder.where(whereBuilder).build();
+    }
+
+    /**
+     * 默认插入指令
+     * 
+     * @param parameterTypeMap 参数
+     * @return 默认插入指令
+     */
+    private String defaultInsert(@Nonnull Map<String, String> parameterTypeMap) {
+        final InsertBuilder insertBuilder = new InsertBuilder(tableInfo.getTableName());
+        for (Entry<String, String> entry : parameterTypeMap.entrySet()) {
+            final ColumnInfo columnInfo = tableInfo.getColumnInfo(entry.getKey());
+            if (columnInfo != null) {
+                String value = "${" + entry.getKey() + "}";
+                if (String.class.getSimpleName().equals(entry.getValue())) {
+                    value = "'" + value + "'";
+                }
+                insertBuilder.columnValue(columnInfo.getColumnName(), value);
+            }
+        }
+        return insertBuilder.build();
+    }
+
+    /**
+     * 默认更新指令
+     * 
+     * @param parameterTypeMap 参数
+     * @return 默认更新指令
+     */
+    private String defaultUpdate(@Nonnull Map<String, String> parameterTypeMap) {
+        final WhereBuilder whereBuilder = new WhereBuilder();
+        final UpdateBuilder updateBuilder = new UpdateBuilder(tableInfo.getTableName());
+        for (Entry<String, String> entry : parameterTypeMap.entrySet()) {
+            final ColumnInfo columnInfo = tableInfo.getColumnInfo(entry.getKey());
+            if (columnInfo != null) {
+                String value = "${" + entry.getKey() + "}";
+                if (String.class.getSimpleName().equals(entry.getValue())) {
+                    value = "'" + value + "'";
+                }
+                if (columnInfo.isPrimary()) {
+                    whereBuilder.equalTo(columnInfo.getColumnName(), value);
+                } else {
+                    updateBuilder.set(columnInfo.getColumnName(), value);
+                }
+            }
+        }
+        return updateBuilder.where(whereBuilder).build();
+    }
+
+    /**
+     * 默认删除指令
+     * 
+     * @param parameterTypeMap 参数
+     * @return 默认删除指令
+     */
+    public String defaultDelete(@Nonnull Map<String, String> parameterTypeMap) {
+        final WhereBuilder whereBuilder = new WhereBuilder();
+        final DeleteBuilder deleteBuilder = new DeleteBuilder(tableInfo.getTableName());
+        for (Entry<String, String> entry : parameterTypeMap.entrySet()) {
+            final ColumnInfo columnInfo = tableInfo.getColumnInfo(entry.getKey());
+            if (columnInfo != null) {
+                String value = "${" + entry.getKey() + "}";
+                if (String.class.getSimpleName().equals(entry.getValue())) {
+                    value = "'" + value + "'";
+                }
+                whereBuilder.equalTo(columnInfo.getColumnName(), value);
+            }
+        }
+        return deleteBuilder.where(whereBuilder).build();
     }
 
 }
