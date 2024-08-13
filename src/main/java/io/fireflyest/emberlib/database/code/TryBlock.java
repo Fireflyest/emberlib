@@ -47,7 +47,7 @@ public class TryBlock extends SourceBlock {
      * 
      * @return 本身
      */
-    public TryBlock addElse() {
+    public TryBlock addFinally() {
         lineList.add("} finally {");
         return this;
     }
