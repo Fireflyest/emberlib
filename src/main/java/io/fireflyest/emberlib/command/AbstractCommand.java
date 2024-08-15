@@ -35,6 +35,11 @@ public abstract class AbstractCommand {
     private String name;
 
     /**
+     * 按任务运行
+     */
+    private boolean schedule;
+
+    /**
      * 是否异步执行
      */
     private boolean async;
@@ -83,6 +88,15 @@ public abstract class AbstractCommand {
     }
 
     /**
+     * 是否以任务的形式运行
+     * 
+     * @return 是否以任务的形式运行
+     */
+    public boolean isSchedule() {
+        return schedule;
+    }
+
+    /**
      * 获取指令的执行方式
      * 
      * @return 是否异步执行
@@ -96,8 +110,8 @@ public abstract class AbstractCommand {
      * 
      * @return 本身
      */
-    public AbstractCommand async() {
-        this.async = true;
+    public AbstractCommand schedule(boolean async) {
+        this.async = async;
         return this;
     }
 
