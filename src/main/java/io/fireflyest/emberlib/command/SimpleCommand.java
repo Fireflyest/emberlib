@@ -62,8 +62,8 @@ public abstract class SimpleCommand extends AbstractCommand
     }
 
     @Override
-    public SimpleCommand async() {
-        super.async();
+    public SimpleCommand schedule(boolean async) {
+        super.schedule(async);
         return this;
     }
 
@@ -106,8 +106,12 @@ public abstract class SimpleCommand extends AbstractCommand
     private boolean executeCommand(@Nonnull CommandSender sender, @Nonnull String[] args) {
         boolean valid = false;
         final CommandRunnable runnable = this.runnable(sender, args);
-        if (this.isAsync() && plugin != null) {
-            runnable.runTaskAsynchronously(plugin);
+        if (this.isSchedule() && plugin != null) {
+            if (this.isAsync()) {
+                runnable.runTaskAsynchronously(plugin);
+            } else {
+                runnable.runTask(plugin);
+            }
             valid = true;
         } else {
             runnable.run();

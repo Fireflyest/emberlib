@@ -89,8 +89,8 @@ public abstract class ComplexCommand extends AbstractCommand
     }
 
     @Override
-    public ComplexCommand async() {
-        super.async();
+    public ComplexCommand schedule(boolean async) {
+        super.schedule(async);
         return this;
     }
 
@@ -136,21 +136,28 @@ public abstract class ComplexCommand extends AbstractCommand
      */
     private boolean executeCommand(@Nonnull CommandSender sender, @Nonnull String[] args) {
         boolean valid = false;
+        boolean schedule = false;
         boolean async = false;
         SubCommand subCommand = null;
         CommandRunnable runnable = null;
         if (args.length == 0) {
+            schedule = this.isSchedule();
             async = this.isAsync();
             runnable = this.runnable(sender, args);
         } else if ((subCommand = subCommands.get(args[0])) != null) {
             final String[] subArgs = new String[args.length - 1];
             System.arraycopy(args, 1, subArgs, 0, args.length - 1);
+            schedule = this.isSchedule();
             async = subCommand.isAsync();
             runnable = subCommand.runnable(sender, subArgs);
         }
         if (runnable != null) {
-            if (async && plugin != null) {
-                runnable.runTaskAsynchronously(plugin);
+            if (schedule && plugin != null) {
+                if (async) {
+                    runnable.runTaskAsynchronously(plugin);
+                } else {
+                    runnable.runTask(plugin);
+                }
                 valid = true;
             } else {
                 runnable.run();

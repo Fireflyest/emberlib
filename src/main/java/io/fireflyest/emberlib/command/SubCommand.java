@@ -41,8 +41,8 @@ public abstract class SubCommand extends AbstractCommand {
     }
 
     @Override
-    public SubCommand async() {
-        super.async();
+    public SubCommand schedule(boolean async) {
+        super.schedule(async);
         return this;
     }
 
