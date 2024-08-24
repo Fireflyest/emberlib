@@ -2,7 +2,7 @@ package io.fireflyest.emberlib.task.exception;
 
 /**
  * @author Fireflyest
- * @see io.fireflyest.emberlib.task.api.Task#execute()
+ * @see io.fireflyest.emberlib.task.Task#execute()
  * @since 1.0
  */
 public class ExecuteException extends Exception {
