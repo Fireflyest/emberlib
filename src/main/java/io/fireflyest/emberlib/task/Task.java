@@ -1,4 +1,4 @@
-package io.fireflyest.emberlib.task.api;
+package io.fireflyest.emberlib.task;
 
 import java.util.ArrayList;
 import java.util.List;

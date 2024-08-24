@@ -4,16 +4,17 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bukkit.plugin.java.JavaPlugin;
-import io.fireflyest.emberlib.task.api.Bundle;
-import io.fireflyest.emberlib.task.api.Task;
-import io.fireflyest.emberlib.task.api.TaskFactory;
-import io.fireflyest.emberlib.task.api.TaskHandler;
+import io.fireflyest.emberlib.task.Bundle;
+import io.fireflyest.emberlib.task.Task;
+import io.fireflyest.emberlib.task.TaskFactory;
+import io.fireflyest.emberlib.task.TaskHandler;
+import io.fireflyest.emberlib.task.TaskWorker;
 
 
 /**
  * 工作线程处理和工作分配的实现
  * @author Fireflyest
- * @since 1.2
+ * @since 1.0
  */
 public class TaskHandlerImpl implements TaskHandler {
 

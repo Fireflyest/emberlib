@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
-import io.fireflyest.emberlib.task.api.Bundle;
 
 /**
  * 任务数据测试

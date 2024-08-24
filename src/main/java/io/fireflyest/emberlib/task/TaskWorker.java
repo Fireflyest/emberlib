@@ -1,4 +1,4 @@
-package io.fireflyest.emberlib.task.core;
+package io.fireflyest.emberlib.task;
 
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -7,7 +7,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import io.fireflyest.emberlib.Print;
-import io.fireflyest.emberlib.task.api.Task;
 import io.fireflyest.emberlib.task.exception.ExecuteException;
 
 /**
@@ -90,7 +89,7 @@ public class TaskWorker {
     /**
      * 循环执行，执行完队列后进入等待状态
      * 
-     * @see io.fireflyest.emberlib.task.api.Task#execute()
+     * @see io.fireflyest.emberlib.task.Task#execute()
      */
     private void loop() {
         while (enable) {
