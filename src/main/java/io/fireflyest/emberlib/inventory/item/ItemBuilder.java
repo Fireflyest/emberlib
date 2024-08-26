@@ -1,11 +1,16 @@
 package io.fireflyest.emberlib.inventory.item;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import io.fireflyest.emberlib.message.formal.TextColorFormal;
+import io.fireflyest.emberlib.util.YamlUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -20,6 +25,9 @@ import java.util.Map;
  * @since 1.0
  */
 public class ItemBuilder {
+
+    private static final String DISPLAY_NAME_KEY = YamlUtils.DATA_PATH + '.' + "display-name";
+    private static final String LORE_KEY = YamlUtils.DATA_PATH + '.' + "lore";
 
     protected boolean update = true;
 
@@ -146,13 +154,12 @@ public class ItemBuilder {
         if (!update) {
             return item.clone();
         }
-
         update = false;
         // 堆
         item = new ItemStack(material == null ? Material.STONE : material);
         item.setAmount(amount);
         // 元数据
-        final ItemMeta meta = item.getItemMeta();
+        ItemMeta meta = item.getItemMeta();
         if (meta == null) {
             return item;
         }
@@ -162,35 +169,69 @@ public class ItemBuilder {
         if (!lore.isEmpty()) {
             meta.setLore(lore);
         }
+        // 颜色
+        if (colorful) {
+            meta = this.colorData(meta);
+        }
+        // 自定义数据
+        if (nbt.size() > 0) {
+            this.nbtData(meta);
+        }
         if (itemFlags != null && itemFlags.length > 0) {
             meta.addItemFlags(itemFlags);
         }
         if (model != -1) {
             meta.setCustomModelData(model);
         }
+        item.setItemMeta(meta);
+        return item;
+    }
 
-        // 颜色
-        if (colorful) {
-            System.out.println("meta.getPersistentDataContainer() = " + meta.getPersistentDataContainer().toString());
-            // this.colorData(nbtItem);
-        }
-        if (nbt.size() > 0) {
-            for (Map.Entry<NamespacedKey, Object> entry : nbt.entrySet()) {
-                final NamespacedKey key = entry.getKey();
-                final Object value = entry.getValue();
-                if (value instanceof String) {
-                    meta.getPersistentDataContainer()
-                        .set(key, PersistentDataType.STRING, (String) value);
-                } else if (value instanceof Integer) {
-                    meta.getPersistentDataContainer()
-                        .set(key, PersistentDataType.INTEGER, (Integer) value);
-                }
+    /**
+     * 自定义数据
+     * 
+     * @param meta 元数据
+     */
+    private void nbtData(ItemMeta meta) {
+        for (Map.Entry<NamespacedKey, Object> entry : nbt.entrySet()) {
+            final NamespacedKey key = entry.getKey();
+            final Object value = entry.getValue();
+            if (value instanceof String) {
+                meta.getPersistentDataContainer()
+                    .set(key, PersistentDataType.STRING, (String) value);
+            } else if (value instanceof Integer) {
+                meta.getPersistentDataContainer()
+                    .set(key, PersistentDataType.INTEGER, (Integer) value);
             }
         }
+    }
 
-        item.setItemMeta(meta);
-
-        return item;
+    /**
+     * 颜色数据
+     * 
+     * @param meta 元数据
+     */
+    private ItemMeta colorData(ItemMeta meta) {
+        final YamlConfiguration yamlContainer = new YamlConfiguration();
+        final String metaYaml = StringUtils.replaceOnce(YamlUtils.serialize(meta), "==", "temp");
+        try {
+            yamlContainer.loadFromString(metaYaml);
+            if (yamlContainer.contains(DISPLAY_NAME_KEY)) {
+                final String rawName = yamlContainer.getString(DISPLAY_NAME_KEY);
+                yamlContainer.set(DISPLAY_NAME_KEY, new TextColorFormal(rawName).toString());
+            }
+            if (yamlContainer.contains(LORE_KEY)) {
+                final List<String> rawLore = yamlContainer.getStringList(LORE_KEY);
+                int linePos = 0;
+                for (String line : rawLore) {
+                    rawLore.set(linePos++, new TextColorFormal(line).toString());
+                }
+                yamlContainer.set(LORE_KEY, rawLore);
+            }
+        } catch (InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+        return meta;
     }
 
     // /**
