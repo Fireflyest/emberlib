@@ -213,7 +213,7 @@ public class ItemBuilder {
      */
     private ItemMeta colorData(ItemMeta meta) {
         final YamlConfiguration yamlContainer = new YamlConfiguration();
-        final String metaYaml = StringUtils.replaceOnce(YamlUtils.serialize(meta), "==", "temp");
+        String metaYaml = StringUtils.replaceOnce(YamlUtils.serialize(meta), "==", "temp");
         try {
             yamlContainer.loadFromString(metaYaml);
             if (yamlContainer.contains(DISPLAY_NAME_KEY)) {
@@ -231,7 +231,8 @@ public class ItemBuilder {
         } catch (InvalidConfigurationException e) {
             e.printStackTrace();
         }
-        return meta;
+        metaYaml = StringUtils.replaceOnce(yamlContainer.saveToString(), "temp", "==");
+        return YamlUtils.deserialize(metaYaml, meta.getClass());
     }
 
     // /**
