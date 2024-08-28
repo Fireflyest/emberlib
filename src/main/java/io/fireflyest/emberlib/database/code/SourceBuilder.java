@@ -112,7 +112,7 @@ public class SourceBuilder {
      * @return 本身
      */
     public SourceBuilder addImport(@Nonnull String... classImports) {
-        Collections.addAll(classImplementList, classImports);
+        Collections.addAll(classImportList, classImports);
         return this;
     }
 
@@ -124,7 +124,7 @@ public class SourceBuilder {
      */
     public SourceBuilder addImport(@Nonnull Class<?>... classImports) {
         for (Class<?> classImport : classImports) {
-            classImplementList.add(classImport.getName());
+            classImportList.add(classImport.getName());
         }
         return this;
     }
