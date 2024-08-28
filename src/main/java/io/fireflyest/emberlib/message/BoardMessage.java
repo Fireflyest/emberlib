@@ -17,7 +17,7 @@ import org.bukkit.scoreboard.Scoreboard;
  * @author Fireflyest
  * @since 1.0
  */
-public class ScoreMessage {
+public class BoardMessage {
 
     /**
      * 通知
@@ -34,7 +34,7 @@ public class ScoreMessage {
     private final JavaPlugin plugin;
     private final Scoreboard scoreboard;
 
-    public ScoreMessage(JavaPlugin plugin, Scoreboard scoreboard) {
+    public BoardMessage(JavaPlugin plugin, Scoreboard scoreboard) {
         this.plugin = plugin;
         this.scoreboard = scoreboard;
     }
@@ -48,7 +48,7 @@ public class ScoreMessage {
      * @param displaySlot 显示位置
      * @return 本身
      */
-    public ScoreMessage registerObjective(
+    public BoardMessage registerObjective(
         @Nonnull String name,
         @Nonnull String criteria,
         @Nonnull String displayName,
