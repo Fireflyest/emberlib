@@ -205,15 +205,16 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
                 if (String.class.getSimpleName().equals(type)) {
                     // 字符串判空和处理单引号
                     methodBlock.addLine("final String "
-                        + varName + "Fix = " 
+                        + varName + "Fix = (" 
                         + replace 
-                        + " == null ? \"NULL\"" + " : " + replace + ".replace(\"'\", \"''\");");
+                        + " == null ? \"\"" 
+                        + " : " + replace + ".replace(\"'\", \"''\"));");
                     replace = varName + "Fix";
                 } else if (boolean.class.getSimpleName().equalsIgnoreCase(type)) {
                     // 布尔类型要转成数字
-                    methodBlock.addLine("final short "
-                        + varName + "Fix ="
-                        + "(" + replace + " ? 1 : 0);");
+                    methodBlock.addLine("final int "
+                        + varName + "Fix = ("
+                        + replace + " ? 1 : 0);");
                     replace = varName + "Fix";
                 }
                 return "\" + " + replace + " + \"";
