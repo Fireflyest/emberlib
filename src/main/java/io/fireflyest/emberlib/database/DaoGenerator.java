@@ -97,15 +97,10 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
 
         source.addImport(tableClassName)
             .addImport(daoClassName)
-            .addImport(ArrayList.class.getName())
-            .addImport(Arrays.class.getName())
-            .addImport(List.class.getName())
-            .addImport(Connection.class.getName())
-            .addImport(PreparedStatement.class.getName())
-            .addImport(Statement.class.getName())
-            .addImport(ResultSet.class.getName())
-            .addImport(SQLException.class.getName())
-            .addImport(DatabaseConnector.class.getName())
+            .addImport(ArrayList.class, Arrays.class, List.class)
+            .addImport(Connection.class, PreparedStatement.class, Statement.class, ResultSet.class)
+            .addImport(SQLException.class)
+            .addImport(DatabaseConnector.class)
             .addImplement(daoSimpleName)
             .addField("public static final String CREATE_TABLE_SQL = \"" + sqlCreateTable + "\"")
             .addField("private final String url")
@@ -182,7 +177,8 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
      * @param parameterTypeMap 参数对应类型
      * @return 替换容器
      */
-    private String varReplace(@Nonnull String sql, @Nonnull Map<String, String> parameterTypeMap) {
+    private String varReplace(@Nonnull String sql, @Nonnull MethodBlock methodBlock) {
+        final Map<String, String> parameterTypeMap = methodBlock.getParameterMap();
         // 参数替换
         return TextUtils.varReplace(
             TextUtils.BRACE_PATTERN, 
@@ -190,22 +186,35 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
             2, 1, 
             key -> {
                 String type = parameterTypeMap.get(key);
+                String varName = key;
                 String replace = key;
+                // 如果给的参数是完整的数据对象
                 if (type == null && key.contains(".")) {
                     final String[] keySplit = StringUtils.split(key, '.');
                     final ColumnInfo columnInfo = tableInfo.getColumnInfo(keySplit[1]);
                     if (columnInfo != null) {
+                        varName = keySplit[1];
                         type = source.simplifyType(columnInfo.getVarDataType());
                         replace = keySplit[0] + "." 
                             + (Boolean.class.getSimpleName().equalsIgnoreCase(type) ? "is" : "get")
-                            + TextUtils.upperFirst(keySplit[1])
+                            + TextUtils.upperFirst(varName)
                             + "()";
                     }
                 }
+                // 处理字符串类型和布尔类型变量
                 if (String.class.getSimpleName().equals(type)) {
-                    replace += ".replace(\"'\", \"''\")";
+                    // 字符串判空和处理单引号
+                    methodBlock.addLine("final String "
+                        + varName + "Fix = " 
+                        + replace 
+                        + " == null ? \"NULL\"" + " : " + replace + ".replace(\"'\", \"''\");");
+                    replace = varName + "Fix";
                 } else if (boolean.class.getSimpleName().equalsIgnoreCase(type)) {
-                    replace = "(" + replace + " ? 1 : 0)";
+                    // 布尔类型要转成数字
+                    methodBlock.addLine("final short "
+                        + varName + "Fix ="
+                        + "(" + replace + " ? 1 : 0);");
+                    replace = varName + "Fix";
                 }
                 return "\" + " + replace + " + \"";
             }
@@ -228,7 +237,7 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
         if ("SELECT".equals(sql)) {
             sql = this.defaultSelect(methodBlock.getParameterMap(), arrayReturn, beanReturn);
         }
-        final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
+        final String sqlReplaced = this.varReplace(sql, methodBlock);
         final String selections = StringUtils.remove(TextUtils.find(SELECT_PATTERN, sql)[0], '`');
         final String resource = "Statement statement = databaseConnection.createStatement(); "
             + "ResultSet resultSet = statement.executeQuery(sqlSelect)";
@@ -379,7 +388,7 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
         if ("INSERT".equals(sql)) {
             sql = this.defaultInsert(methodBlock.getParameterMap());
         }
-        final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
+        final String sqlReplaced = this.varReplace(sql, methodBlock);
         final String resource = "PreparedStatement preparedStatement"
             + " = databaseConnection.prepareStatement(sqlInsert" 
             + (voidReturn ? ")" : ", Statement.RETURN_GENERATED_KEYS)");
@@ -416,7 +425,7 @@ public class DaoGenerator extends ElementScanner8<Void, Void> {
         } else if ("DELETE".equals(sql)) {
             sql = this.defaultDelete(methodBlock.getParameterMap());
         }
-        final String sqlReplaced = this.varReplace(sql, methodBlock.getParameterMap());
+        final String sqlReplaced = this.varReplace(sql, methodBlock);
         final String resource = 
             "PreparedStatement preparedStatement = databaseConnection.prepareStatement(sqlUpdate)";
         final TryBlock tryBlock = new TryBlock(resource)
