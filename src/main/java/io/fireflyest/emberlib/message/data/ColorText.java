@@ -1,7 +1,6 @@
 package io.fireflyest.emberlib.message.data;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,7 @@ import java.util.List;
 public class ColorText {
 
     @SerializedName("extra")
-    private List<ExtraDTO> extra;
+    private List<ExtraData> extra;
 
     @SerializedName("text")
     private String text;
@@ -26,11 +25,11 @@ public class ColorText {
         this.text = text;
     }
 
-    public List<ExtraDTO> getExtra() {
+    public List<ExtraData> getExtra() {
         return extra;
     }
 
-    public void setExtra(List<ExtraDTO> extra) {
+    public void setExtra(List<ExtraData> extra) {
         this.extra = extra;
     }
 

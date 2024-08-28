@@ -1,19 +1,18 @@
 package io.fireflyest.emberlib.message.formal;
 
 import com.google.gson.Gson;
-
 import io.fireflyest.emberlib.message.data.ColorText;
-import io.fireflyest.emberlib.message.data.ExtraDTO;
+import io.fireflyest.emberlib.message.data.ExtraData;
 import io.fireflyest.emberlib.util.ColorUtils;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.bukkit.util.NumberConversions;
 
 /**
+ * 颜色文本
+ * 
  * @author Fireflyest
- * @since 2022/8/30
+ * @since 1.0
  */
 public class TextColorFormal {
 
@@ -67,7 +66,7 @@ public class TextColorFormal {
      */
     private void formalText() {
         // 遍历每一个句子
-        for (ExtraDTO extraDTO : originText.getExtra()) {
+        for (ExtraData extraDTO : originText.getExtra()) {
 
             String sentence = extraDTO.getText();
             // 判断是否有参数
@@ -82,7 +81,7 @@ public class TextColorFormal {
                 return;
             }
 
-            ExtraDTO startExtraDTO = new ExtraDTO();
+            ExtraData startExtraDTO = new ExtraData();
             startExtraDTO.setBold(extraDTO.getBold());
             startExtraDTO.setItalic(extraDTO.getItalic());
             startExtraDTO.setObfuscated(extraDTO.getObfuscated());
@@ -118,8 +117,8 @@ public class TextColorFormal {
      * @param key 属性键
      * @param value 属性值
      */
-    private void formalSentence(ExtraDTO extraDTO, String textValue, String key, String value) {
-        ExtraDTO partExtraDTO;
+    private void formalSentence(ExtraData extraDTO, String textValue, String key, String value) {
+        ExtraData partExtraDTO;
         String startColor;
         String endColor;
         switch (key) {
@@ -129,7 +128,7 @@ public class TextColorFormal {
                 if (startColor == null || endColor == null) return;
                 int charPos = 0;
                 for (String color : ColorUtils.gradient(startColor, endColor, textValue.length())) {
-                    partExtraDTO = new ExtraDTO();
+                    partExtraDTO = new ExtraData();
                     partExtraDTO.setBold(extraDTO.getBold());
                     partExtraDTO.setItalic(extraDTO.getItalic());
                     partExtraDTO.setObfuscated(extraDTO.getObfuscated());
@@ -151,7 +150,7 @@ public class TextColorFormal {
                 int phase = NumberConversions.toInt(value.split(":")[3]);
                 if (phase >= colors.length) phase = colors.length - 1;
                 if (phase < 0) phase = 0;
-                partExtraDTO = new ExtraDTO();
+                partExtraDTO = new ExtraData();
                 partExtraDTO.setBold(extraDTO.getBold());
                 partExtraDTO.setItalic(extraDTO.getItalic());
                 partExtraDTO.setObfuscated(extraDTO.getObfuscated());
@@ -162,7 +161,7 @@ public class TextColorFormal {
                 formalText.getExtra().add(partExtraDTO);
                 break;
             case "c": // 颜色 §r$<c=#FFFFFF>
-                partExtraDTO = new ExtraDTO();
+                partExtraDTO = new ExtraData();
                 partExtraDTO.setBold(extraDTO.getBold());
                 partExtraDTO.setItalic(extraDTO.getItalic());
                 partExtraDTO.setObfuscated(extraDTO.getObfuscated());
