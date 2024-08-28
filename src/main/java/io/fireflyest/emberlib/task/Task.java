@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import io.fireflyest.emberlib.task.exception.ExecuteException;
 
 /**
  * 任务
@@ -40,10 +39,8 @@ public abstract class Task {
 
     /**
      * 执行任务
-     * 
-     * @throws ExecuteException 执行出错
      */
-    public abstract void execute() throws ExecuteException;
+    public abstract void execute();
 
     /**
      * 设置任务执行的通知对象
