@@ -7,7 +7,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import io.fireflyest.emberlib.Print;
-import io.fireflyest.emberlib.task.exception.ExecuteException;
 
 /**
  * 任务执行类
@@ -117,7 +116,7 @@ public class TaskWorker {
                 // Restore interrupted state...
                 Thread.currentThread().interrupt();
                 this.stop();
-            } catch (ExecuteException e) {
+            } catch (Exception e) {
                 Print.EMBER_LIB.error("Error on '{}' execute, '{}' stop working!", taskName, name);
                 e.printStackTrace();
                 this.stop();
