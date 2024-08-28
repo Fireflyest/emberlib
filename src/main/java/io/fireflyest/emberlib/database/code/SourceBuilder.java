@@ -1,6 +1,7 @@
 package io.fireflyest.emberlib.database.code;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
@@ -107,11 +108,24 @@ public class SourceBuilder {
     /**
      * 添加导入
      * 
-     * @param classImport 类导入
+     * @param classImports 类导入
      * @return 本身
      */
-    public SourceBuilder addImport(String classImport) {
-        classImportList.add(classImport);
+    public SourceBuilder addImport(@Nonnull String... classImports) {
+        Collections.addAll(classImplementList, classImports);
+        return this;
+    }
+
+    /**
+     * 添加导入
+     * 
+     * @param classImports 类导入
+     * @return 本身
+     */
+    public SourceBuilder addImport(@Nonnull Class<?>... classImports) {
+        for (Class<?> classImport : classImports) {
+            classImplementList.add(classImport.getName());
+        }
         return this;
     }
 
