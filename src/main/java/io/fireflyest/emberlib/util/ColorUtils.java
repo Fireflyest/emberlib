@@ -2,7 +2,9 @@ package io.fireflyest.emberlib.util;
 
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
+import org.bukkit.util.NumberConversions;
 
 /**
  * 颜色工具类
@@ -19,6 +21,7 @@ public final class ColorUtils {
 
     /**
      * 将颜色转为字符串
+     * 
      * @param color 颜色
      * @return 颜色字符串
      */
@@ -28,6 +31,7 @@ public final class ColorUtils {
 
     /**
      * 文本转换为颜色
+     * 
      * @param color 颜色
      * @return 颜色
      */
@@ -38,6 +42,7 @@ public final class ColorUtils {
 
     /**
      * 渐变颜色
+     * 
      * @param start 起始颜色
      * @param end 结束颜色
      * @param num 过渡颜色数量，不少于2
@@ -45,48 +50,56 @@ public final class ColorUtils {
      */
     public static String[] gradient(@Nonnull String start, @Nonnull String end, int num) {
         // 判断格式是否正确
-        if (num < 2) num = 2;
-        if (num > 255) num = 255;
-        String[] colors = new String[num];
-        if (!colorPattern.matcher(start).matches() || !colorPattern.matcher(end).matches()) return colors;
+        if (num < 2) {
+            num = 2;
+        }
+        if (num > 255) {
+            num = 255;
+        }
+        final String[] colors = new String[num];
+        if (!colorPattern.matcher(start).matches() || !colorPattern.matcher(end).matches()) {
+            return colors;
+        }
         // 转化成整数计算
-        int startColor = Integer.parseInt(start.substring(1), 16);
-        int endColor = Integer.parseInt(end.substring(1), 16);
+        final int startColor = Integer.parseInt(StringUtils.remove(start, '#'), 16);
+        final int endColor = Integer.parseInt(StringUtils.remove(end, '#'), 16);
         // 计算过渡
-        int startR = rr(startColor);
-        int startG = gg(startColor);
-        int startB = bb(startColor);
-        float deltaR = (rr(endColor) - startR) / (num - 1F);
-        float deltaG = (gg(endColor) - startG) / (num - 1F);
-        float deltaB = (bb(endColor) - startB) / (num - 1F);
+        final int startR = rr(startColor);
+        final int startG = gg(startColor);
+        final int startB = bb(startColor);
+        final double deltaR = (rr(endColor) - startR) / (num - 1.0);
+        final double deltaG = (gg(endColor) - startG) / (num - 1.0);
+        final double deltaB = (bb(endColor) - startB) / (num - 1.0);
         for (int i = 0; i < num; i++) {
             colors[i] = "#" 
-                + Integer.toHexString(startR + (int) (i * deltaR))
-                + Integer.toHexString(startG + (int) (i * deltaG))
-                + Integer.toHexString(startB + (int) (i * deltaB));
+                + Integer.toHexString(startR + NumberConversions.round(i * deltaR))
+                + Integer.toHexString(startG + NumberConversions.round(i * deltaG))
+                + Integer.toHexString(startB + NumberConversions.round(i * deltaB));
         }
         return colors;
     }
 
     /**
      * 两种颜色的距离
+     * 
      * @param c1 颜色1
      * @param c2 颜色2
      * @return 距离
      */
     public static int distance(@Nonnull Color c1, @Nonnull Color c2) {
-        double rmean = (c1.getRed() + c2.getRed()) / 2.0;
-        int r = c1.getRed() - c2.getRed();
-        int g = c1.getGreen() - c2.getGreen();
-        int b = c1.getBlue() - c2.getBlue();
-        double weightR = 2 + rmean / 256.0;
-        double weightG = 4.0;
-        double weightB = 2 + (255 - rmean) / 256.0;
-        return (int)(weightR * r * r + weightG * g * g + weightB * b * b);
+        final double rmean = (c1.getRed() + c2.getRed()) / 2.0;
+        final int r = c1.getRed() - c2.getRed();
+        final int g = c1.getGreen() - c2.getGreen();
+        final int b = c1.getBlue() - c2.getBlue();
+        final double weightR = 2 + rmean / 256.0;
+        final double weightG = 4.0;
+        final double weightB = 2 + (255 - rmean) / 256.0;
+        return NumberConversions.round(weightR * r * r + weightG * g * g + weightB * b * b);
     }
 
     /**
      * 获取红色
+     * 
      * @param color 颜色
      * @return 红色
      */
@@ -96,6 +109,7 @@ public final class ColorUtils {
 
     /**
      * 获取绿色
+     * 
      * @param color 颜色
      * @return 绿色
      */
@@ -105,6 +119,7 @@ public final class ColorUtils {
 
     /**
      * 获取蓝色
+     * 
      * @param color 颜色
      * @return 蓝色
      */

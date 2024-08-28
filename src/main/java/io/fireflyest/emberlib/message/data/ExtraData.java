@@ -2,20 +2,32 @@ package io.fireflyest.emberlib.message.data;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ExtraDTO {
+/**
+ * 句子
+ * 
+ * @author Fireflyest
+ * @since 1.0
+ */
+public class ExtraData {
 
     @SerializedName("bold")
     private Boolean bold;
+
     @SerializedName("italic")
     private Boolean italic;
+
     @SerializedName("underlined")
     private Boolean underlined;
+
     @SerializedName("strikethrough")
     private Boolean strikethrough;
+
     @SerializedName("obfuscated")
     private Boolean obfuscated;
+
     @SerializedName("color")
     private String color;
+
     @SerializedName("text")
     private String text;
 
@@ -74,4 +86,5 @@ public class ExtraDTO {
     public void setText(String text) {
         this.text = text;
     }
+
 }

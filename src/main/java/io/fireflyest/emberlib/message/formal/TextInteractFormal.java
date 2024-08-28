@@ -7,10 +7,10 @@ import org.bukkit.util.NumberConversions;
 
 import com.google.gson.Gson;
 
-import io.fireflyest.emberlib.message.data.ClickEventDTO;
-import io.fireflyest.emberlib.message.data.HoverEventContentsDTO;
-import io.fireflyest.emberlib.message.data.HoverEventDTO;
-import io.fireflyest.emberlib.message.data.InteractExtraDTO;
+import io.fireflyest.emberlib.message.data.ClickEventData;
+import io.fireflyest.emberlib.message.data.HoverEventContentsData;
+import io.fireflyest.emberlib.message.data.HoverEventData;
+import io.fireflyest.emberlib.message.data.InteractExtraData;
 import io.fireflyest.emberlib.message.data.InteractText;
 import io.fireflyest.emberlib.util.ColorUtils;
 
@@ -63,7 +63,7 @@ public class TextInteractFormal {
      */
     private void formalText() {
         // 遍历每一个句子
-        for (InteractExtraDTO extraDTO : originText.getExtra()) {
+        for (InteractExtraData extraDTO : originText.getExtra()) {
 
             String sentence = extraDTO.getText();
             // 判断是否有参数
@@ -75,7 +75,7 @@ public class TextInteractFormal {
             Matcher attributeMatcher = attributePattern.matcher(sentence);
             String[] splitTexts = sentence.split("\\$<([^<]*)>");
 
-            InteractExtraDTO startExtraDTO = new InteractExtraDTO();
+            InteractExtraData startExtraDTO = new InteractExtraData();
             startExtraDTO.setBold(extraDTO.getBold());
             startExtraDTO.setItalic(extraDTO.getItalic());
             startExtraDTO.setObfuscated(extraDTO.getObfuscated());
@@ -95,25 +95,25 @@ public class TextInteractFormal {
                 String textValue = splitTexts[pos++];
                 Matcher varMatcher = varPattern.matcher(attribute);
 
-                ClickEventDTO clickEventDTO = null;
-                HoverEventDTO hoverEventDTO = null;
+                ClickEventData clickEventDTO = null;
+                HoverEventData hoverEventDTO = null;
                 // 获取属性中的全部变量键值对
                 while (varMatcher.find()) {
                     String[] colorVar = varMatcher.group().split("=");
                     if ("ce".equals(colorVar[0])) {
                         String[] kv = colorVar[1].split("•");
-                        clickEventDTO = new ClickEventDTO();
+                        clickEventDTO = new ClickEventData();
                         clickEventDTO.setAction(kv[0]);
                         clickEventDTO.setValue(kv[1]);
                     } else if ("he".equals(colorVar[0])) {
                         String[] kv = colorVar[1].split("•");
                         if (kv.length == 2) {
-                            hoverEventDTO = new HoverEventDTO();
+                            hoverEventDTO = new HoverEventData();
                             hoverEventDTO.setAction(kv[0]);
                             hoverEventDTO.setValue(kv[1]);
                         } else if (kv.length == 3) {
-                            hoverEventDTO = new HoverEventDTO();
-                            HoverEventContentsDTO hoverEventContentsDTO = new HoverEventContentsDTO();
+                            hoverEventDTO = new HoverEventData();
+                            HoverEventContentsData hoverEventContentsDTO = new HoverEventContentsData();
                             hoverEventContentsDTO.setId(kv[1]);
                             hoverEventContentsDTO.setTag(kv[2]);
                             hoverEventDTO.setAction(kv[0]);
@@ -135,9 +135,9 @@ public class TextInteractFormal {
      * @param key 属性键
      * @param value 属性值
      */
-    private void formalSentence(InteractExtraDTO extraDTO, ClickEventDTO clickEventDTO, HoverEventDTO hoverEventDTO, 
+    private void formalSentence(InteractExtraData extraDTO, ClickEventData clickEventDTO, HoverEventData hoverEventDTO, 
             String textValue, String key, String value) {
-        InteractExtraDTO partExtraDTO;
+        InteractExtraData partExtraDTO;
         String startColor;
         String endColor;
         switch (key) {
@@ -147,7 +147,7 @@ public class TextInteractFormal {
                 if (startColor == null || endColor == null) return;
                 int charPos = 0;
                 for (String color : ColorUtils.gradient(startColor, endColor, textValue.length())) {
-                    partExtraDTO = new InteractExtraDTO();
+                    partExtraDTO = new InteractExtraData();
                     partExtraDTO.setBold(extraDTO.getBold());
                     partExtraDTO.setItalic(extraDTO.getItalic());
                     partExtraDTO.setObfuscated(extraDTO.getObfuscated());
@@ -171,7 +171,7 @@ public class TextInteractFormal {
                 int phase = NumberConversions.toInt(value.split(":")[3]);
                 if (phase >= colors.length) phase = colors.length - 1;
                 if (phase < 0) phase = 0;
-                partExtraDTO = new InteractExtraDTO();
+                partExtraDTO = new InteractExtraData();
                 partExtraDTO.setBold(extraDTO.getBold());
                 partExtraDTO.setItalic(extraDTO.getItalic());
                 partExtraDTO.setObfuscated(extraDTO.getObfuscated());
@@ -184,7 +184,7 @@ public class TextInteractFormal {
                 formalText.getExtra().add(partExtraDTO);
                 break;
             case "c": // 颜色 §r$<c=#FFFFFF>
-                partExtraDTO = new InteractExtraDTO();
+                partExtraDTO = new InteractExtraData();
                 partExtraDTO.setBold(extraDTO.getBold());
                 partExtraDTO.setItalic(extraDTO.getItalic());
                 partExtraDTO.setObfuscated(extraDTO.getObfuscated());

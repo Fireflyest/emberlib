@@ -1,7 +1,6 @@
 package io.fireflyest.emberlib.message.data;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,7 @@ import java.util.List;
 public class InteractText {
 
     @SerializedName("extra")
-    private List<InteractExtraDTO> extra;
+    private List<InteractExtraData> extra;
 
     @SerializedName("text")
     private String text;
@@ -26,11 +25,11 @@ public class InteractText {
         this.text = text;
     }
 
-    public List<InteractExtraDTO> getExtra() {
+    public List<InteractExtraData> getExtra() {
         return extra;
     }
 
-    public void setExtra(List<InteractExtraDTO> extra) {
+    public void setExtra(List<InteractExtraData> extra) {
         this.extra = extra;
     }
 

@@ -211,7 +211,7 @@ public class ItemBuilder {
      * 
      * @param meta 元数据
      */
-    private ItemMeta colorData(ItemMeta meta) {
+    public ItemMeta colorData(ItemMeta meta) {
         final YamlConfiguration yamlContainer = new YamlConfiguration();
         String metaYaml = StringUtils.replaceOnce(YamlUtils.serialize(meta), "==", "temp");
         try {
