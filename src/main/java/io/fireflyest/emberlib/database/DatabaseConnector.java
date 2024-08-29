@@ -118,15 +118,15 @@ public final class DatabaseConnector {
      * 关闭所有
      */
     public static void closeAll() {
-        try {
-            for (Connection connection : connectionMap.values()) {
+        for (Connection connection : connectionMap.values()) {
+            try {
                 if (connection == null || connection.isClosed()) {
                     continue;
                 }
                 connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
