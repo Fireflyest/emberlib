@@ -4,6 +4,7 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bukkit.plugin.java.JavaPlugin;
+import io.fireflyest.emberlib.Print;
 import io.fireflyest.emberlib.task.Bundle;
 import io.fireflyest.emberlib.task.Task;
 import io.fireflyest.emberlib.task.TaskFactory;
@@ -25,11 +26,12 @@ public class TaskHandlerImpl implements TaskHandler {
      * 由本插件实例化后发放到服务
      */
     public TaskHandlerImpl() {
-        // 
+        //
     }
 
     @Override
     public void createWorker(@Nonnull String name, @Nonnull JavaPlugin plugin) {
+        Print.EMBER_LIB.info("TaskWorker {} create by plugin {}!", name, plugin.getName());
         if (workerMap.containsKey(name)) {
             workerMap.get(name).stop();
         }
