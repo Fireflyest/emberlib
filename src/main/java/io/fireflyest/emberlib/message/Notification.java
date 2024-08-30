@@ -3,6 +3,7 @@ package io.fireflyest.emberlib.message;
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import org.bukkit.entity.Player;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 /**
  * 通知中心，发布各种消息
@@ -19,6 +20,13 @@ public interface Notification {
      * @param boardMessage 计分榜
      */
     void addBoard(@Nonnull String name, @Nonnull BoardMessage boardMessage);
+
+    /**
+     * 删除计分榜
+     * 
+     * @param name 名称
+     */
+    void removeBoard(@Nonnull String name);
 
     /**
      * 推送全计分榜消息
@@ -111,5 +119,28 @@ public interface Notification {
     void titleOne(@Nonnull String title, 
                   @Nonnull String subtitle, int exist, 
                   @Nonnull Player player);
+
+    /**
+     * 发送消息给所有玩家
+     * 
+     * @param message 消息
+     */
+    void sendAll(@Nonnull BaseComponent[] message);
+
+    /**
+     * 发消息给多个玩家
+     * 
+     * @param message 消息
+     * @param players 多个玩家
+     */
+    void sendSome(@Nonnull BaseComponent[] message, @Nonnull Collection<? extends Player> players);
+
+    /**
+     * 发送消息给单个玩家
+     * 
+     * @param message 消息
+     * @param player 玩家
+     */
+    void sendOne(@Nonnull BaseComponent[] message, @Nonnull Player player);
 
 }
