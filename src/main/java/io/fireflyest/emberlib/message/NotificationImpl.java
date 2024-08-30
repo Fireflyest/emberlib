@@ -5,15 +5,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.annotation.Nonnull;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 /**
@@ -36,6 +34,11 @@ public class NotificationImpl implements Notification {
     @Override
     public void addBoard(@Nonnull String name, @Nonnull BoardMessage boardMessage) {
         boardMap.put(name, boardMessage);
+    }
+
+    @Override
+    public void removeBoard(@Nonnull String name) {
+        boardMap.remove(name);
     }
 
     @Override
@@ -79,9 +82,10 @@ public class NotificationImpl implements Notification {
     public void popOne(@Nonnull String message, int exist, 
                        @Nonnull Player player) {
         final String playerName = player.getName();
+        final TextComponent text = new TextComponent(message);
         // 下次可弹出时间
         if (!popMap.containsKey(playerName) || popMap.get(playerName).isBefore(Instant.now())) {
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, text);
             popMap.put(playerName, Instant.now().plusMillis(exist));
         } else {
             // 上一个消息结束的时间点
@@ -91,8 +95,7 @@ public class NotificationImpl implements Notification {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    player.spigot()
-                          .sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, text);
                 }
             }.runTaskLater(plugin, timePoint);
             // 可发送时间再推迟
@@ -102,24 +105,42 @@ public class NotificationImpl implements Notification {
 
     @Override
     public void titleAll(@Nonnull String title, @Nonnull String subtitle, int exist) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'titleAll'");
+        this.titleSome(title, subtitle, exist, Bukkit.getOnlinePlayers());
     }
 
     @Override
     public void titleSome(@Nonnull String title, 
                           @Nonnull String subtitle, int exist, 
                           @Nonnull Collection<? extends Player> players) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'titleSome'");
+        for (Player player : players) {
+            this.titleOne(title, subtitle, exist, player);
+        }
     }
 
     @Override
     public void titleOne(@Nonnull String title, 
                          @Nonnull String subtitle, int exist, 
                          @Nonnull Player player) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'titleOne'");
+        player.sendTitle(title, subtitle, 10, exist, 20);
+    }
+
+    @Override
+    public void sendAll(@Nonnull BaseComponent[] message) {
+        Bukkit.spigot().broadcast(message);
+    }
+
+    @Override
+    public void sendSome(@Nonnull BaseComponent[] message, 
+                         @Nonnull Collection<? extends Player> players) {
+        for (Player player : players) {
+            this.sendOne(message, player);
+        }
+    }
+
+    @Override
+    public void sendOne(@Nonnull BaseComponent[] message, 
+                        @Nonnull Player player) {
+        player.spigot().sendMessage(message);
     }
     
 }
