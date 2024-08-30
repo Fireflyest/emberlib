@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.bukkit.scheduler.BukkitTask;
+import io.fireflyest.emberlib.EmberLib;
 
 /**
  * 数据库连接工具类
@@ -22,9 +24,12 @@ public final class DatabaseConnector {
     public static final String MYSQL_OLD = "com.mysql.jdbc.Driver";
     public static final String SQLITE = "org.sqlite.JDBC";
 
+    private static final int AUTO_CLOSE_DELAY = 20 * 60 * 5;
+
     private static final Set<String> loadedClass = new HashSet<>();
     private static final Map<String, ConnectInfo> connectInfoMap = new ConcurrentHashMap<>();
     private static final Map<String, Connection> connectionMap = new ConcurrentHashMap<>();
+    private static final Map<String, BukkitTask> closeTaskMap = new ConcurrentHashMap<>();
 
     private DatabaseConnector() {
     }
@@ -74,6 +79,21 @@ public final class DatabaseConnector {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        if (connection != null) {
+            // 若上一次自动关闭未执行，取消它
+            final BukkitTask closeTask = closeTaskMap.get(url);
+            if (closeTask != null && !closeTask.isCancelled()) {
+                closeTask.cancel();
+            }
+            // 五分钟后自动关闭
+            final ConnectCloseRunnable closeRunnable = new ConnectCloseRunnable(url, connection);
+            final BukkitTask latestCloseTask = closeRunnable.runTaskLaterAsynchronously(
+                EmberLib.getPlugin(), AUTO_CLOSE_DELAY
+            );
+            closeTaskMap.put(url, latestCloseTask);
+        }
+
         return connection;
     }
 
