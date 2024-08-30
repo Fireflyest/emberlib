@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import io.fireflyest.emberlib.Print;
 import io.fireflyest.emberlib.config.YamlValue;
 import io.fireflyest.emberlib.config.annotation.Entry;
 import io.fireflyest.emberlib.config.annotation.Yaml;
@@ -128,6 +129,11 @@ public final class YamlUtils {
         if (yaml == null) { // 没注释的不管
             return;
         }
+        Print.EMBER_LIB.debug("Plugin {} loading config file {} to class {}!", 
+            plugin.getName(),
+            yaml.value(), 
+            theClass.getSimpleName()
+        );
         boolean saveYamlFile = false;
         final FileConfiguration yamlFile = loadYaml(plugin, yaml.value());
         try {
