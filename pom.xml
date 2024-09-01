@@ -80,6 +80,10 @@
       <id>sonatype</id>
       <url>https://oss.sonatype.org/content/groups/public/</url>
     </repository>
+    <repository>
+      <id>dmulloy2-repo</id>
+      <url>https://repo.dmulloy2.net/repository/public/</url>
+    </repository>
   </repositories>
 
   <dependencies>
@@ -107,19 +111,9 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <artifactId>asm</artifactId>
-      <groupId>org.ow2.asm</groupId>
-      <version>9.2</version>
-    </dependency>
-    <dependency>
-      <artifactId>asm-tree</artifactId>
-      <groupId>org.ow2.asm</groupId>
-      <version>9.2</version>
-    </dependency>
-    <dependency>
-      <artifactId>asm-commons</artifactId>
-      <groupId>org.ow2.asm</groupId>
-      <version>9.2</version>
+      <groupId>com.comphenix.protocol</groupId>
+      <artifactId>ProtocolLib</artifactId>
+      <version>5.1.0</version>
     </dependency>
   </dependencies>
 
