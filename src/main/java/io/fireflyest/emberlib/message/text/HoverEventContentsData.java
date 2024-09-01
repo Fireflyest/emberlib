@@ -1,4 +1,4 @@
-package io.fireflyest.emberlib.message.data;
+package io.fireflyest.emberlib.message.text;
 
 import com.google.gson.annotations.SerializedName;
 

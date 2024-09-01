@@ -1,20 +1,23 @@
-package io.fireflyest.emberlib.message.data;
+package io.fireflyest.emberlib.message.text;
 
 import com.google.gson.annotations.SerializedName;
 
 /**
- * 文本点击事件
+ * 悬浮事件
  * 
  * @author Fireflyest
  * @since 1.0
  */
-public class ClickEventData {
+public class HoverEventData {
 
     @SerializedName("action")
     private String action;
 
     @SerializedName("value")
     private String value;
+
+    @SerializedName("contents")
+    private HoverEventContentsData contents;
 
     public String getAction() {
         return action;
@@ -32,4 +35,12 @@ public class ClickEventData {
         this.value = value;
     }
 
+    public HoverEventContentsData getContents() {
+        return contents;
+    }
+
+    public void setContents(HoverEventContentsData contents) {
+        this.contents = contents;
+    }
+    
 }
