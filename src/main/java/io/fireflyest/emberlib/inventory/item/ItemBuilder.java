@@ -9,7 +9,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import io.fireflyest.emberlib.message.formal.TextColorFormal;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.fireflyest.emberlib.message.text.TextData;
+import io.fireflyest.emberlib.message.text.TextJsonDeserializer;
 import io.fireflyest.emberlib.util.YamlUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,6 +28,10 @@ import java.util.Map;
  * @since 1.0
  */
 public class ItemBuilder {
+
+    private final Gson gson = new GsonBuilder()
+        .registerTypeAdapter(TextData.class, new TextJsonDeserializer())
+        .create();
 
     private static final String DISPLAY_NAME_KEY = YamlUtils.DATA_PATH + '.' + "display-name";
     private static final String LORE_KEY = YamlUtils.DATA_PATH + '.' + "lore";
@@ -218,13 +225,19 @@ public class ItemBuilder {
             yamlContainer.loadFromString(metaYaml);
             if (yamlContainer.contains(DISPLAY_NAME_KEY)) {
                 final String rawName = yamlContainer.getString(DISPLAY_NAME_KEY);
-                yamlContainer.set(DISPLAY_NAME_KEY, new TextColorFormal(rawName).toString());
+                yamlContainer.set(
+                    DISPLAY_NAME_KEY, 
+                    gson.toJson(gson.fromJson(rawName, TextData.class))
+                );
             }
             if (yamlContainer.contains(LORE_KEY)) {
                 final List<String> rawLore = yamlContainer.getStringList(LORE_KEY);
                 int linePos = 0;
                 for (String line : rawLore) {
-                    rawLore.set(linePos++, new TextColorFormal(line).toString());
+                    rawLore.set(
+                        linePos++, 
+                        gson.toJson(gson.fromJson(line, TextData.class))
+                    );
                 }
                 yamlContainer.set(LORE_KEY, rawLore);
             }

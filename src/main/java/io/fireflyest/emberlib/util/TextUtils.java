@@ -30,12 +30,12 @@ public final class TextUtils {
     /**
      * 变量格式 ${key}
      */
-    public static final Pattern BRACE_PATTERN = Pattern.compile("\\$\\{([^{}]*)}");
+    public static final Pattern BRACE_PATTERN = Pattern.compile("\\$\\{([^}]*)}");
 
     /**
      * 变量格式 {index}
      */
-    public static final Pattern FORMAT_PATTERN = Pattern.compile("\\{([^{}]*)}");
+    public static final Pattern FORMAT_PATTERN = Pattern.compile("\\{([^}]*)}");
 
     /**
      * 驼峰后面的每个首大写字母
@@ -75,14 +75,28 @@ public final class TextUtils {
      * 匹配文本
      * 
      * @param pattern 正则表达式的编译表示
-     * @param str 需要变量替换的文本
-     * @return 替换后的文本
+     * @param str 文本
+     * @return 是否匹配
      */
     public static boolean match(@Nonnull Pattern pattern, @Nullable String str) {
         if (str == null) {
             return false;
         }
         return pattern.matcher(str).matches();
+    }
+
+    /**
+     * 包含文本
+     * 
+     * @param pattern 正则表达式的编译表示
+     * @param str 文本
+     * @return 是否包含
+     */
+    public static boolean contains(@Nonnull Pattern pattern, @Nullable String str) {
+        if (str == null) {
+            return false;
+        }
+        return pattern.matcher(str).find();
     }
 
     /**
