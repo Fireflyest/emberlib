@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 构建自定义物品
@@ -64,8 +65,8 @@ public class ItemBuilder {
      * @param material 材料名称
      */
     public ItemBuilder(@Nonnull String material) {
-        // Optional<XMaterial> xMaterial = XMaterial.matchXMaterial(material);
-        // xMaterial.ifPresent(value -> this.material = value.parseMaterial());
+        final Optional<XMaterial> optional = XMaterial.matchXMaterial(material);
+        optional.ifPresent(value -> this.material = value.parseMaterial());
     }
 
     /**
@@ -247,25 +248,5 @@ public class ItemBuilder {
         metaYaml = StringUtils.replaceOnce(yamlContainer.saveToString(), "temp", "==");
         return YamlUtils.deserialize(metaYaml, meta.getClass());
     }
-
-    // /**
-    //  * 颜色数据
-    //  * @param nbtItem 物品
-    //  */
-    // private void colorData(NBTItem nbtItem) {
-    //     NBTCompound display = nbtItem.getCompound("display");
-    //     if (display != null) {
-    //         // name
-    //         display.setString("Name", new TextColorFormal(display.getString("Name")).toString());
-    //         // lore
-    //         NBTList<String> loreList = display.getStringList("Lore");
-    //         if (loreList != null) {
-    //             int lorePos = 0;
-    //             for (String loreString : loreList) {
-    //                 loreList.set(lorePos++, new TextColorFormal(loreString).toString());
-    //             }
-    //         }
-    //     }
-    // }
 
 }
