@@ -210,6 +210,9 @@ public class ItemBuilder {
             } else if (value instanceof Integer) {
                 meta.getPersistentDataContainer()
                     .set(key, PersistentDataType.INTEGER, (Integer) value);
+            } else if (value instanceof Double) {
+                meta.getPersistentDataContainer()
+                    .set(key, PersistentDataType.DOUBLE, (Double) value);
             }
         }
     }
