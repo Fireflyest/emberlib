@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,11 +19,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.NumberConversions;
 import io.fireflyest.emberlib.Print;
 import io.fireflyest.emberlib.inventory.Page;
@@ -350,7 +353,6 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         if (cursor != null) {
             System.out.println("cursor=" + cursor.getAmount());
         }
-
         if (holder instanceof Page) {
             // 点击的是视图
             final Page page = (Page) holder;
@@ -370,12 +372,51 @@ public class ViewGuideImpl implements ViewGuide, Listener {
                 player.getOpenInventory().getTopInventory().getHolder();
             if (inventoryHolder instanceof Page) {
                 final Page page = (Page) inventoryHolder;
-                // TODO: 
+                // TODO: shift进容器的实现
             }
             event.setCancelled(true);
         }
     }
-    
+
+    /**
+     * 监听玩家在容器中拖动物品，将物品分散到各个格的时候的事件
+     * 
+     * @param event 物品拖动事件
+     */
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        final Player player = ((Player) event.getWhoClicked());
+        final Inventory inventory = event.getInventory();
+        if (inventory == null || !viewingMap.containsKey(player.getName())) {
+            return;
+        }
+        final InventoryHolder holder = inventory.getHolder();
+        if (holder instanceof Page) {
+            // 点击的是视图
+            final Page page = (Page) holder;
+            final Set<Integer> giveBackSet = new HashSet<>();
+            for (Integer key : event.getNewItems().keySet()) {
+                if (key >= 0 && key < page.getInventory().getSize()) {
+                    giveBackSet.add(key);
+                }
+            }
+            if (!giveBackSet.isEmpty()) {
+                // 清空
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        for (Integer slot : giveBackSet) {
+                            final ItemStack item = inventory.getItem(slot);
+                            // TODO: 拖拽实现
+                            inventory.setItem(slot, null);
+                            player.getInventory().addItem(item);
+                        }
+                    }
+                }.runTask(plugin);
+            }
+        }
+    }
+
     /**
      * 玩家关闭容器，说明一次浏览结束
      * 
