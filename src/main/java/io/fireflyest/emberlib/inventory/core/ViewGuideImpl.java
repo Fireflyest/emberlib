@@ -7,10 +7,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -331,6 +331,26 @@ public class ViewGuideImpl implements ViewGuide, Listener {
     }
 
     /**
+     * 玩家关闭容器，说明一次浏览结束
+     * 
+     * @param event 容器关闭事件
+     */
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        this.closeView(event.getPlayer().getName());
+    }
+
+    /**
+     * 玩家离线
+     * 
+     * @param event 离线事件
+     */
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        this.closeView(event.getPlayer().getName());
+    }
+
+    /**
      * 容器点击事件
      * 
      * @param event 容器点击事件
@@ -346,35 +366,33 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         final ItemStack currentItem = event.getCurrentItem();
         final ItemStack cursor = event.getCursor();
         final InventoryHolder holder = clickedInventory.getHolder();
-        System.out.println("inventoryAction=" + inventoryAction.toString());
-        if (currentItem != null) {
-            System.out.println("currentItem=" + currentItem.getAmount());
-        }
-        if (cursor != null) {
-            System.out.println("cursor=" + cursor.getAmount());
-        }
+        ActionResult result = null;
+        Page page = null;
         if (holder instanceof Page) {
             // 点击的是视图
-            final Page page = (Page) holder;
-            ActionResult result = null;
+            page = (Page) holder;
             try {
                 result = page.action(event.getSlot(), inventoryAction, player, currentItem, cursor);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if (inventoryAction == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+            // 玩家点击的是自己的背包，并把背包物品移动到视图容器内
+            final Inventory inventory = player.getOpenInventory().getTopInventory();
+            final InventoryHolder inventoryHolder = inventory.getHolder();
+            Validate.notNull(currentItem);
+            page = (Page) inventoryHolder;
+            result = this.processMove(inventory, player, page, currentItem);
+        } else if (inventoryAction == InventoryAction.COLLECT_TO_CURSOR) {
+            // 玩家点击的是自己的背包，并双击收集物品
+            event.setCancelled(true);
+        }
+        
+        if (page != null) {
             if (result == null || !result.isAllow()) {
                 event.setCancelled(true);
             }
             this.processResult(result, player, page);
-        } else if (inventoryAction == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-            // 玩家点击的是自己的背包，把背包物品移动到视图容器内
-            final InventoryHolder inventoryHolder = 
-                player.getOpenInventory().getTopInventory().getHolder();
-            if (inventoryHolder instanceof Page) {
-                final Page page = (Page) inventoryHolder;
-                // TODO: shift进容器的实现
-            }
-            event.setCancelled(true);
         }
     }
 
@@ -393,48 +411,78 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         final InventoryHolder holder = inventory.getHolder();
         if (holder instanceof Page) {
             // 点击的是视图
-            final Page page = (Page) holder;
-            final Set<Integer> giveBackSet = new HashSet<>();
+            final Set<Integer> slotSet = new HashSet<>();
             for (Integer key : event.getNewItems().keySet()) {
-                if (key >= 0 && key < page.getInventory().getSize()) {
-                    giveBackSet.add(key);
+                if (key >= 0 && key < inventory.getSize()) {
+                    slotSet.add(key);
                 }
             }
-            if (!giveBackSet.isEmpty()) {
-                // 清空
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        for (Integer slot : giveBackSet) {
-                            final ItemStack item = inventory.getItem(slot);
-                            // TODO: 拖拽实现
-                            inventory.setItem(slot, null);
-                            player.getInventory().addItem(item);
-                        }
-                    }
-                }.runTask(plugin);
-            }
+            this.processDrag(slotSet, inventory, player);
         }
     }
 
     /**
-     * 玩家关闭容器，说明一次浏览结束
+     * 处理移动物品
      * 
-     * @param event 容器关闭事件
+     * @param inventory 容器
+     * @param player 玩家
+     * @param page 页面
+     * @param currentItem 物品
+     * @return 处理结果
      */
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        this.closeView(event.getPlayer().getName());
+    @Nullable
+    private ActionResult processMove(@Nonnull Inventory inventory, 
+                                     @Nonnull Player player,
+                                     @Nonnull Page page,
+                                     @Nonnull ItemStack currentItem) {
+        final int maxStackSize = currentItem.getMaxStackSize();
+        ActionResult result = null;
+        int slot = inventory.first(currentItem.getType());
+        if (slot == -1 || inventory.getItem(slot).getAmount() >= maxStackSize
+                        || !inventory.getItem(slot).isSimilar(currentItem)) {
+            slot = inventory.firstEmpty();
+        }
+        try {
+            result = page.moveIn(slot, player, currentItem);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     /**
-     * 玩家离线
+     * 处理拖拽结果
      * 
-     * @param event 离线事件
+     * @param slotSet 涉及的槽位集合
+     * @param inventory 容器
+     * @param player 玩家
      */
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        this.closeView(event.getPlayer().getName());
+    private void processDrag(@Nonnull Set<Integer> slotSet, 
+                             @Nonnull Inventory inventory, 
+                             @Nonnull Player player) {
+        if (slotSet.isEmpty()) {
+            return;
+        }
+        final Page page = (Page) inventory.getHolder();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                slotSet.forEach(slot -> {
+                    final ItemStack item = inventory.getItem(slot);
+                    ActionResult result = null;
+                    try {
+                        result = page.dragIn(slot, player, item);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (result == null || !result.isAllow()) {
+                        inventory.setItem(slot, null);
+                        player.getInventory().addItem(item);
+                    }
+                    processResult(result, player, page);
+                });
+            }
+        }.runTask(plugin);
     }
 
     /**

@@ -12,7 +12,16 @@ public class TestPage extends Page {
 
     @Override
     public void refreshPage() {
-        this.slot(pageNumber, new ItemStack(Material.SADDLE));
+
+        this.slot(0, new ItemStack(Material.SADDLE));
+        this.slot(1, new ItemStack(Material.SADDLE));
+        this.slot(2, new ItemStack(Material.SADDLE));
+        this.slot(3, new ItemStack(Material.SADDLE));
+        this.slot(4, new ItemStack(Material.SADDLE));
+        this.slot(5, new ItemStack(Material.SADDLE));
+        this.slot(6, new ItemStack(Material.SADDLE));
+        this.slot(7, new ItemStack(Material.SADDLE));
+        this.slot(8, new ItemStack(Material.STONE));
     }
     
 }

@@ -70,7 +70,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     /**
      * 是否需要刷新
      */
-    protected boolean refresh;
+    protected boolean refresh = true;
 
     /**
      * 一个页面节点
@@ -198,18 +198,56 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      * 
      * @param index 点击的位置
      * @param inventoryAction 容器操作事件
+     * @param player 玩家
+     * @param currentItem 点击的物品
+     * @param cursor 指针上的物品
      * @return 事件处理结果
      */
     @Nullable
     public ActionResult action(int index, @Nonnull InventoryAction inventoryAction, 
             @Nonnull Player player, @Nullable ItemStack currentItem, @Nullable ItemStack cursor) {
-        Print.VIEW_GUIDE.debug("Player {} {} currentItem:{} cursor:{}", 
+        Print.VIEW_GUIDE.debug("Player {} {} on {} currentItem:{} cursor:{}", 
             player.getName(), 
             inventoryAction,
+            index,
             currentItem == null ? "null" : currentItem.getType().name(),
             cursor == null ? "null" : cursor.getType().name());
         final Slot slot = slotMap.computeIfAbsent(index, k -> new Slot());
         return slot.getResult(inventoryAction);
+    }
+
+    /**
+     * 使用 {@link org.bukkit.event.inventory.InventoryAction#MOVE_TO_OTHER_INVENTORY} 移动物品入容器，
+     * 如果容器已满，传入的 {@code index} 为 -1
+     * 
+     * @param index 位置
+     * @param player 玩家
+     * @param currentItem 物品
+     * @return 事件处理结果
+     */
+    public ActionResult moveIn(int index, @Nonnull Player player, @Nullable ItemStack currentItem) {
+        Print.VIEW_GUIDE.debug("Player {} move item:{} on {}", 
+            player.getName(), 
+            currentItem,
+            index);
+        return new ActionResult(false, ActionResult.ACTION_NONE);
+    }
+
+    /**
+     * 使用拖拽把物品放入容器 
+     * 
+     * @param index 位置
+     * @param player 玩家
+     * @param item 物品
+     * @see org.bukkit.event.inventory.InventoryDragEvent
+     * @return 事件处理结果
+     */
+    public ActionResult dragIn(int index, @Nonnull Player player, @Nullable ItemStack item) {
+        Print.VIEW_GUIDE.debug("Player {} drag item:{} on {}", 
+            player.getName(), 
+            item,
+            index);
+        return new ActionResult(false, ActionResult.ACTION_NONE);
     }
 
     /**
