@@ -18,18 +18,16 @@ public enum Print {
     /**
      * 视图导航
      */
-    VIEW_GUIDE("ViewGuide");
+    VIEW_GUIDE("ViewGuide"),
+
+    ;
 
     private static final String COLOR_RESET = "\033[0m";
-    private static final String COLOR_BLACK = "\033[30m";
     private static final String COLOR_RED = "\033[31m";
     private static final String COLOR_GREEN = "\033[32m";
     private static final String COLOR_YELLOW = "\033[33m";
     private static final String COLOR_BLUE = "\033[34m";
     private static final String COLOR_PURPLE = "\033[35m";
-    private static final String COLOR_CYAN = "\033[36m";
-
-    private static final String BACKGROUND_RED = "\033[41m";
 
     private final String title;
     private final Logger logger;
@@ -47,7 +45,6 @@ public enum Print {
      * @param throwable 错误
      */
     public void catching(Throwable throwable) {
-        // TODO: 
         logger.catching(throwable);
     }
 
@@ -104,7 +101,7 @@ public enum Print {
      * @param params 参数
      */
     public void fatal(String message, Object... params) {
-        message = BACKGROUND_RED + "[" + title + "] " + COLOR_RESET + message;
+        message = "[" + COLOR_PURPLE + title + COLOR_RESET + "] " + message;
         logger.fatal(message, params);
     }
 

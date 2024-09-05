@@ -7,7 +7,7 @@ public class TestView extends View {
     @Override
     @Nullable
     public Page getHomePage(@Nullable String target) {
-        return pagesMap.computeIfAbsent(target, k -> new TestPage(target, 0, 54));
+        return pagesMap.computeIfAbsent(target, k -> new TestPage(target, 0, 9));
     }
     
 }
