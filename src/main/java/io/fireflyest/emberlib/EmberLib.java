@@ -1,10 +1,13 @@
 package io.fireflyest.emberlib;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
+import io.fireflyest.emberlib.inventory.ViewGuide;
+import io.fireflyest.emberlib.inventory.core.ViewGuideImpl;
 import io.fireflyest.emberlib.message.Notification;
 import io.fireflyest.emberlib.message.NotificationImpl;
 import io.fireflyest.emberlib.util.ChatUtils;
@@ -15,6 +18,9 @@ import io.fireflyest.emberlib.util.ChatUtils;
  */
 public final class EmberLib extends JavaPlugin {
 
+    private Server server;
+    private ViewGuideImpl guide;
+
     /**
      * 获取这个插件
      * 
@@ -23,10 +29,13 @@ public final class EmberLib extends JavaPlugin {
     public static EmberLib getPlugin() {
         return getPlugin(EmberLib.class);
     }
-
+    
     @Override
     public void onEnable() {
-        Print.EMBER_LIB.info("enable");
+        Print.EMBER_LIB.info("   ____      __           __   _ __ ");
+        Print.EMBER_LIB.info("  / __/_ _  / /  ___ ____/ /  (_) / ");
+        Print.EMBER_LIB.info(" / _//  ' \\/ _ \\/ -_) __/ /__/ / _ \\");
+        Print.EMBER_LIB.info("/___/_/_/_/_.__/\\__/_/ /____/_/_.__/");
 
         Notification notification = new NotificationImpl(this);
         new BukkitRunnable() {
@@ -38,11 +47,20 @@ public final class EmberLib extends JavaPlugin {
                 notification.sendOne(ChatUtils.textEntity(Bukkit.getPlayer("Fireflyest"), null), Bukkit.getPlayer("Fireflyest"));
             }
         }.runTaskLater(this, 100);
+
+        server = this.getServer();
+
+        Print.EMBER_LIB.info("Registering service of guide.");
+        Print.VIEW_GUIDE.onDebug();
+        guide = new ViewGuideImpl(this);
+        server.getPluginManager().registerEvents(guide, this);
+        server.getServicesManager().register(ViewGuide.class, guide, this, ServicePriority.Normal);
     }
 
     @Override
     public void onDisable() {
-        
+        guide.disable();
+        server.getServicesManager().unregisterAll(this);
     }
 
 }

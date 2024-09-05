@@ -13,7 +13,12 @@ public enum Print {
     /**
      * 本插件打印
      */
-    EMBER_LIB("EmberLib");
+    EMBER_LIB("EmberLib"),
+
+    /**
+     * 视图导航
+     */
+    VIEW_GUIDE("ViewGuide");
 
     private static final String COLOR_RESET = "\033[0m";
     private static final String COLOR_BLACK = "\033[30m";

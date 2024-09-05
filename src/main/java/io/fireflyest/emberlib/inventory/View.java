@@ -12,7 +12,10 @@ import javax.annotation.Nullable;
  */
 public abstract class View {
     
-    protected final Map<String, ViewPage> pagesMap = new HashMap<>();
+    /**
+     * 对应的页面，指向链表的首页 {@link #getHomePage(String)}
+     */
+    protected final Map<String, Page> pagesMap = new HashMap<>();
 
     /**
      * 获取某个页面链表的表头，即首页
@@ -21,7 +24,7 @@ public abstract class View {
      * @return 展示页面
      */
     @Nullable
-    public abstract ViewPage getHomePage(@Nullable String target);
+    public abstract Page getHomePage(@Nullable String target);
 
     /**
      * 删除某个页面链表
