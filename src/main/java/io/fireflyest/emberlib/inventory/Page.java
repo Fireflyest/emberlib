@@ -70,7 +70,12 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     /**
      * 是否需要刷新
      */
-    protected boolean refresh = true;
+    protected int refresh = 1;
+
+    /**
+     * 刷新间隔
+     */
+    protected int refreshInterval = -1;
 
     /**
      * 一个页面节点
@@ -166,7 +171,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      */
     public void updateTitle(String title) {
         this.title = title;
-        this.refresh = true;
+        this.refresh = 1;
         if (inventoryType == InventoryType.CHEST) {
             inventory = Bukkit.createInventory(this, size, title);
         } else {
@@ -180,17 +185,36 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      * @return 是否需要刷新
      */
     public boolean needRefresh() {
-        return refresh;
+        return refresh > 0;
     }
 
     /**
-     * 标记为需要刷新
+     * 标记一次刷新
      */
     public void markRefresh() {
-        this.refresh = true;
         if (next != null) {
             next.markRefresh();
         }
+        this.refresh++;
+    }
+
+    /**
+     * 标记多次刷新
+     * 
+     * @param refresh 刷新次数
+     */
+    public void markRefresh(int refresh) {
+        if (next != null) {
+            next.markRefresh(refresh);
+        }
+        this.refresh += refresh;
+    }
+
+    /**
+     * 获取刷新间隔
+     */
+    public int getRefreshInterval() {
+        return refreshInterval;
     }
 
     /**
@@ -267,8 +291,11 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
 
     @Override
     public void run() {
-        this.refresh = false;
         this.refreshPage();
+        this.refresh = refreshInterval == -1 ? 0 : refresh - 1;
+        if (refresh <= 0) {
+            this.cancel();
+        }
     }
 
     /**

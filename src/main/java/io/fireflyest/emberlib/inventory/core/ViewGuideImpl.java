@@ -1,13 +1,14 @@
 package io.fireflyest.emberlib.inventory.core;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.lang.Validate;
@@ -26,6 +27,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.NumberConversions;
 import io.fireflyest.emberlib.Print;
 import io.fireflyest.emberlib.inventory.Page;
@@ -44,22 +46,27 @@ public class ViewGuideImpl implements ViewGuide, Listener {
     /**
      * 所有视图
      */
-    private final Map<String, View> viewMap = new HashMap<>();
+    private final Map<String, View> viewMap = new ConcurrentHashMap<>();
 
     /**
      * 玩家正在浏览的界面名称
      */
-    public final Map<String, String> viewingMap = new HashMap<>();
+    public final Map<String, String> viewingMap = new ConcurrentHashMap<>();
 
     /**
      * 跳转页面，玩家会先打开页面，再关闭原有页面，为了防止取消使用记录，这里记录重定向
      */
-    private final Set<String> viewRedirect = new HashSet<>();
+    private final Set<String> viewRedirect = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * 浏览记录，先进后出
      */
-    private final Map<String, Deque<Page>> viewUsdMap = new HashMap<>();
+    private final Map<String, Deque<Page>> viewUsdMap = new ConcurrentHashMap<>();
+
+    /**
+     * 刷新任务
+     */
+    private final Map<Page, BukkitTask> refreshTaskMap = new ConcurrentHashMap<>();
 
     private final JavaPlugin plugin;
 
@@ -136,7 +143,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         viewingMap.put(playerName, viewName);
         // 打开容器
         if (page.needRefresh()) {
-            page.runTaskAsynchronously(plugin);
+            this.refreshPageTask(page);
         }
         player.openInventory(page.getInventory());
     }
@@ -175,7 +182,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
                 Print.VIEW_GUIDE.debug("Player {} page next", playerName);
                 viewRedirect.add(playerName);
                 if (nextPage.needRefresh()) {
-                    nextPage.runTaskAsynchronously(plugin);
+                    this.refreshPageTask(nextPage);
                 }
                 player.openInventory(nextPage.getInventory());
             }
@@ -195,7 +202,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
                 Print.VIEW_GUIDE.debug("Player {} page pre", playerName);
                 viewRedirect.add(playerName);
                 if (prePage.needRefresh()) {
-                    prePage.runTaskAsynchronously(plugin);
+                    this.refreshPageTask(prePage);
                 }
                 player.openInventory(prePage.getInventory());
             }
@@ -219,7 +226,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         Print.VIEW_GUIDE.debug("Player {} page back", playerName);
         viewRedirect.add(playerName);
         if (backPage.needRefresh()) {
-            backPage.runTaskAsynchronously(plugin);
+            this.refreshPageTask(backPage);
         }
         player.openInventory(backPage.getInventory());
     }
@@ -246,7 +253,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
             Print.VIEW_GUIDE.debug("Player {} page jump", playerName);
             viewRedirect.add(playerName);
             if (jumpPage.needRefresh()) {
-                jumpPage.runTaskAsynchronously(plugin);
+                this.refreshPageTask(jumpPage);
             }
             player.openInventory(jumpPage.getInventory());
         }
@@ -265,7 +272,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
                 if (!singlePage) {
                     usingPage.markRefresh();
                 }
-                usingPage.runTaskAsynchronously(plugin);
+                this.refreshPageTask(usingPage);
             }
         }
     }
@@ -290,7 +297,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
             }
             final Page usingPage = this.getUsingPage(entry.getKey());
             if (usingPage != null && this.targetEqual(target, usingPage.getTarget())) {
-                usingPage.runTaskAsynchronously(plugin);
+                this.refreshPageTask(usingPage);
             }
         }
     }
@@ -318,6 +325,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
      * 关闭
      */
     public void disable() {
+        // 关闭所有正在浏览，防止容器内物品被操作
         final Iterator<Entry<String, String>> iterator = viewingMap.entrySet().iterator();
         while (iterator.hasNext()) {
             final Entry<String, String> entry = iterator.next();
@@ -327,7 +335,12 @@ public class ViewGuideImpl implements ViewGuide, Listener {
                 player.closeInventory();
             }
         }
+        // 清空视图
         viewMap.clear();
+        // 取消所有刷新任务
+        for (BukkitTask refreshTask : refreshTaskMap.values()) {
+            refreshTask.cancel();
+        }
     }
 
     /**
@@ -556,6 +569,21 @@ public class ViewGuideImpl implements ViewGuide, Listener {
      */
     private boolean targetEqual(@Nullable String t1, @Nullable String t2) {
         return (t1 == null && t2 == null) || (t1 != null && t1.equals(t2));
+    }
+
+    /**
+     * 刷新页面
+     * 
+     * @param page 页面
+     */
+    private void refreshPageTask(@Nonnull Page page) {
+        // 获取旧的刷新任务
+        BukkitTask refreshTask = refreshTaskMap.get(page);
+        // 如果没有刷新任务或者刷新完毕，重新运行任务
+        if (refreshTask == null || refreshTask.isCancelled()) {
+            refreshTask = page.runTaskTimerAsynchronously(plugin, 0, page.getRefreshInterval());
+            refreshTaskMap.put(page, refreshTask);
+        }
     }
 
 }
