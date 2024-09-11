@@ -583,11 +583,11 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         if (refreshTask == null || refreshTask.isCancelled()) {
             final int interval = page.getRefreshInterval();
             if (interval < 0) {
-                refreshTask = page.runTaskAsynchronously(plugin);
+                page.runTaskAsynchronously(plugin);
             } else {
                 refreshTask = page.runTaskTimerAsynchronously(plugin, 0, interval);
+                refreshTaskMap.put(page, refreshTask);
             }
-            refreshTaskMap.put(page, refreshTask);
         }
     }
 
