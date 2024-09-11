@@ -75,7 +75,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     /**
      * 刷新间隔
      */
-    protected int refreshInterval = -1;
+    protected int refreshInterval = 20;
 
     /**
      * 一个页面节点
