@@ -581,7 +581,12 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         BukkitTask refreshTask = refreshTaskMap.get(page);
         // 如果没有刷新任务或者刷新完毕，重新运行任务
         if (refreshTask == null || refreshTask.isCancelled()) {
-            refreshTask = page.runTaskTimerAsynchronously(plugin, 0, page.getRefreshInterval());
+            final int interval = page.getRefreshInterval();
+            if (interval < 0) {
+                refreshTask = page.runTaskAsynchronously(plugin);
+            } else {
+                refreshTask = page.runTaskTimerAsynchronously(plugin, 0, interval);
+            }
             refreshTaskMap.put(page, refreshTask);
         }
     }
