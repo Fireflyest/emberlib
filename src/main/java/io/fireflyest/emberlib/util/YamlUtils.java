@@ -14,7 +14,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import io.fireflyest.emberlib.Print;
-import io.fireflyest.emberlib.config.YamlValue;
+import io.fireflyest.emberlib.config.Box;
 import io.fireflyest.emberlib.config.annotation.Entry;
 import io.fireflyest.emberlib.config.annotation.Yaml;
 
@@ -147,10 +147,10 @@ public final class YamlUtils {
                 final Object value = yamlFile.get(key);
                 if (value == null || value instanceof MemorySection) {
                     saveYamlFile = true;
-                    final Method get = YamlValue.class.getDeclaredMethod("get");
+                    final Method get = Box.class.getDeclaredMethod("get");
                     yamlFile.set(key, get.invoke(field.get(null)));
                 } else {
-                    final Method set = YamlValue.class.getDeclaredMethod("set", Object.class);
+                    final Method set = Box.class.getDeclaredMethod("set", Object.class);
                     set.invoke(field.get(null), value);
                 }
             }
