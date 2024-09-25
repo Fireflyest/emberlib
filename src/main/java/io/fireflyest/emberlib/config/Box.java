@@ -6,11 +6,11 @@ package io.fireflyest.emberlib.config;
  * @author Fireflyest
  * @since 
  */
-public class YamlValue<T> {
+public class Box<T> {
 
     private T value;
 
-    public YamlValue(T defaultValue) {
+    public Box(T defaultValue) {
         this.value = defaultValue;
     }
 
