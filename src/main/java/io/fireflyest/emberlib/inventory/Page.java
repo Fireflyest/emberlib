@@ -1,5 +1,6 @@
 package io.fireflyest.emberlib.inventory;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
@@ -23,7 +24,7 @@ import io.fireflyest.emberlib.Print;
 public abstract class Page extends BukkitRunnable implements InventoryHolder {
 
     /**
-     * 槽位
+     * 槽位，对应容器 {@link #inventory} 中的物品的操作属性
      */
     protected final Map<Integer, Slot> slotMap;
 
@@ -55,7 +56,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     /**
      * 标题
      */
-    protected String title = "";
+    protected String title = "Page";
 
     /**
      * 下一页
@@ -65,7 +66,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     /**
      * 上一页
      */
-    protected Page pre = null;
+    protected WeakReference<Page> pre = null;
 
     /**
      * 是否需要刷新
@@ -143,7 +144,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      */
     @Nullable
     public Page getPre() {
-        return pre;
+        return pre.get();
     }
 
     /**
@@ -161,7 +162,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      * @param pre 上一页
      */
     public void setPre(@Nullable Page pre) {
-        this.pre = pre;
+        this.pre = new WeakReference<>(pre);
     }
 
     /**
@@ -263,7 +264,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      * @param index 位置
      * @param player 玩家
      * @param item 物品
-     * @see org.bukkit.event.inventory.InventoryDragEvent
+     * @see org.bukkit.event.inventory.InventoryDragEvent#getNewItems()
      * @return 事件处理结果
      */
     public ActionResult dragIn(int index, @Nonnull Player player, @Nullable ItemStack item) {
