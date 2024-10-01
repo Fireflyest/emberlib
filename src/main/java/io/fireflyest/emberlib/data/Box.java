@@ -1,12 +1,12 @@
-package io.fireflyest.emberlib.config;
+package io.fireflyest.emberlib.data;
 
 /**
- * 配置数据
+ * 箱子，存储一个对象的地址
  * 
  * @author Fireflyest
- * @since 
+ * @since 1.0
  */
-public class Box<T> {
+public final class Box<T> {
 
     private T value;
 
