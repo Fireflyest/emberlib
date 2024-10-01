@@ -14,9 +14,9 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import io.fireflyest.emberlib.Print;
-import io.fireflyest.emberlib.config.Box;
 import io.fireflyest.emberlib.config.annotation.Entry;
 import io.fireflyest.emberlib.config.annotation.Yaml;
+import io.fireflyest.emberlib.data.Box;
 
 /**
  * 配置文件工具类
@@ -34,6 +34,18 @@ public final class YamlUtils {
      * 配置文件编辑器
      */
     private static final YamlConfiguration yaml = new YamlConfiguration();
+
+    private static Method get = null;
+    private static Method set = null;
+
+    static {
+        try {
+            get = Box.class.getDeclaredMethod("get");
+            set = Box.class.getDeclaredMethod("set", Object.class);
+        } catch (NoSuchMethodException | SecurityException e) {
+            e.printStackTrace();
+        }
+    }
 
     private YamlUtils() {
         //
@@ -129,15 +141,15 @@ public final class YamlUtils {
         if (yaml == null) { // 没注释的不管
             return;
         }
+        final FileConfiguration yamlFile = loadYaml(plugin, yaml.value());
+        boolean saveYamlFile = false;
         Print.EMBER_LIB.debug("Plugin {} loading config file {} to class {}!", 
             plugin.getName(),
             yaml.value(), 
             theClass.getSimpleName()
         );
-        boolean saveYamlFile = false;
-        final FileConfiguration yamlFile = loadYaml(plugin, yaml.value());
-        try {
-            for (Field field : theClass.getDeclaredFields()) {
+        for (Field field : theClass.getDeclaredFields()) {
+            try {
                 final Entry entry = field.getAnnotation(Entry.class);
                 if (entry == null) { // 没注释的不管
                     continue;
@@ -147,18 +159,15 @@ public final class YamlUtils {
                 final Object value = yamlFile.get(key);
                 if (value == null || value instanceof MemorySection) {
                     saveYamlFile = true;
-                    final Method get = Box.class.getDeclaredMethod("get");
                     yamlFile.set(key, get.invoke(field.get(null)));
                 } else {
-                    final Method set = Box.class.getDeclaredMethod("set", Object.class);
                     set.invoke(field.get(null), value);
                 }
-            }
-        } catch (NoSuchMethodException | SecurityException 
-                                       | IllegalAccessException 
+            } catch (SecurityException | IllegalAccessException 
                                        | IllegalArgumentException 
                                        | InvocationTargetException e) {
-            e.printStackTrace();
+                e.printStackTrace();
+            }
         }
         // 保存文件
         if (saveYamlFile) {
