@@ -7,6 +7,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.fireflyest.emberlib.data.Latest;
@@ -33,6 +34,7 @@ public final class UpdateUtils {
      * @param dataClass 数据类
      * @return 请求返回数据
      */
+    @Nullable
     public static <T> T doGet(String uri, Class<T> dataClass) {
         T t = null;
         try {
@@ -52,6 +54,7 @@ public final class UpdateUtils {
      * @param version 现版本
      * @return 新版本下载地址
      */
+    @Nullable
     public static String checkUpdate(String pluginName, String version) {
         final String infoUrl = "https://api.github.com/repos/Fireflyest/" + pluginName + "/releases/latest";
         final Latest latest = doGet(infoUrl, Latest.class);
@@ -71,6 +74,7 @@ public final class UpdateUtils {
      * @param dataClass 数据类
      * @return 请求返回数据
      */
+    @Nullable
     public static <T> T doPost(String uri, Map<String, String> values, Class<T> dataClass) {
         return doPost(uri, gson.toJson(values), dataClass);
     }
@@ -84,6 +88,7 @@ public final class UpdateUtils {
      * @param dataClass 数据类
      * @return 请求返回数据
      */
+    @Nullable
     public static <T> T doPost(String uri, List<String> values, Class<T> dataClass) {
         return doPost(uri, gson.toJson(values), dataClass);
     }
@@ -97,6 +102,7 @@ public final class UpdateUtils {
      * @param dataClass 数据类
      * @return 请求返回数据
      */
+    @Nullable
     public static <T> T doPost(String uri, String data, Class<T> dataClass) {
         T t = null;
         try {
