@@ -66,7 +66,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     /**
      * 上一页
      */
-    protected WeakReference<Page> pre = null;
+    protected WeakReference<Page> pre = new WeakReference<>(null);
 
     /**
      * 是否需要刷新
