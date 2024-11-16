@@ -8,12 +8,12 @@ package io.fireflyest.emberlib.data;
  */
 public class Pair<A, B> {
     
-    private A firstValue;
-    private B secondValue;
+    private final A first;
+    private final B second;
 
-    public Pair(A firstValue, B secondValue) {
-        this.firstValue = firstValue;
-        this.secondValue = secondValue;
+    public Pair(A first, B second) {
+        this.first = first;
+        this.second = second;
     }
 
     /**
@@ -22,7 +22,7 @@ public class Pair<A, B> {
      * @return 第一个数据
      */
     public A first() {
-        return this.firstValue;
+        return this.first;
     }
 
     /**
@@ -31,25 +31,11 @@ public class Pair<A, B> {
      * @return 第二个数据
      */
     public B second() {
-        return this.secondValue;
+        return this.second;
     }
 
-    /**
-     * 设置第一个数据
-     * 
-     * @param firstValue 第一个数据
-     */
-    public void setFirstValue(A firstValue) {
-        this.firstValue = firstValue;
-    }
-
-    /**
-     * 设置第二个数据
-     * 
-     * @param secondValue 第二个数据
-     */
-    public void setSecondValue(B secondValue) {
-        this.secondValue = secondValue;
+    public static <A, B> Pair<A, B> of(A firstValue, B secondValue) {
+        return new Pair<>(firstValue, secondValue);
     }
 
 }
