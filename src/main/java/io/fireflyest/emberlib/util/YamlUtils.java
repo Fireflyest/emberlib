@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -119,13 +120,13 @@ public final class YamlUtils {
     /**
      * 加载配置文件
      * @param plugin 插件
-     * @param child 子路径
+     * @param fileName 子路径
      * @return 配置文件
      */
-    public static FileConfiguration loadYaml(@Nonnull JavaPlugin plugin, @Nonnull String child) {
-        final File file = new File(plugin.getDataFolder(), child);
+    public static FileConfiguration loadYaml(@Nonnull JavaPlugin plugin, @Nonnull String fileName) {
+        final File file = new File(plugin.getDataFolder(), fileName);
         if (!file.exists()) {
-            plugin.saveResource(child, false);
+            plugin.saveResource(fileName, false);
         }
         return YamlConfiguration.loadConfiguration(file);
     }
@@ -135,28 +136,34 @@ public final class YamlUtils {
      * 
      * @param plugin 插件
      * @param theClass 配置类
+     * @param fileName 配置文件名
      */
-    public static void loadToClass(@Nonnull JavaPlugin plugin, @Nonnull Class<?> theClass) {
-        final Yaml yaml = theClass.getAnnotation(Yaml.class);
-        if (yaml == null) { // 没注释的不管
-            return;
+    public static void loadToClass(@Nonnull JavaPlugin plugin, @Nonnull Class<?> theClass, 
+            @Nullable String fileName) {
+        String yamlFileName = fileName;
+        if (yamlFileName == null) {
+            final Yaml yaml = theClass.getAnnotation(Yaml.class);
+            if (yaml == null) {
+                return;
+            }
+            yamlFileName = yaml.value();
         }
-        final FileConfiguration yamlFile = loadYaml(plugin, yaml.value());
+        final FileConfiguration yamlFile = loadYaml(plugin, yamlFileName);
         boolean saveYamlFile = false;
         Print.EMBER_LIB.debug("Plugin {} loading config file {} to class {}!", 
             plugin.getName(),
-            yaml.value(), 
+            yamlFileName, 
             theClass.getSimpleName()
         );
         for (Field field : theClass.getDeclaredFields()) {
+            final Entry entry = field.getAnnotation(Entry.class);
+            if (entry == null) { // 没注释的不管
+                continue;
+            }
+            final String key = "".equals(entry.value()) 
+                ? defaultKey(field.getName()) : entry.value();
+            final Object value = yamlFile.get(key);
             try {
-                final Entry entry = field.getAnnotation(Entry.class);
-                if (entry == null) { // 没注释的不管
-                    continue;
-                }
-                final String key = "".equals(entry.value()) 
-                    ? defaultKey(field.getName()) : entry.value();
-                final Object value = yamlFile.get(key);
                 if (value == null || value instanceof MemorySection) {
                     saveYamlFile = true;
                     yamlFile.set(key, get.invoke(field.get(null)));
@@ -171,11 +178,23 @@ public final class YamlUtils {
         }
         // 保存文件
         if (saveYamlFile) {
-            try {
-                yamlFile.save(new File(plugin.getDataFolder(), yaml.value()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            saveYaml(plugin, yamlFile, yamlFileName);
+        }
+    }
+
+    /**
+     * 保存数据到yaml文件
+     * 
+     * @param plugin 插件
+     * @param yamlFile 配置文件
+     * @param fileName 文件名
+     */
+    public static void saveYaml(@Nonnull JavaPlugin plugin, @Nonnull FileConfiguration yamlFile, 
+            @Nonnull String fileName) {
+        try {
+            yamlFile.save(new File(plugin.getDataFolder(), fileName));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
