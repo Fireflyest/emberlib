@@ -44,14 +44,18 @@ import io.fireflyest.emberlib.inventory.ViewGuide;
 public class ViewGuideImpl implements ViewGuide, Listener {
 
     /**
-     * 所有视图
+     * 所有视图 viewName -> view
      */
     private final Map<String, View> viewMap = new ConcurrentHashMap<>();
 
     /**
-     * 玩家正在浏览的界面名称
+     * 玩家正在浏览的界面名称 playerName -> viewName
      */
     public final Map<String, String> viewingMap = new ConcurrentHashMap<>();
+    /**
+     * 正在被浏览的页面 viewName -> playerNameSet
+     */
+    public final Map<String, Set<String>> viewerMap = new ConcurrentHashMap<>();
 
     /**
      * 跳转页面，玩家会先打开页面，再关闭原有页面，为了防止取消使用记录，这里记录重定向
@@ -82,6 +86,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
 
     @Override
     public void removeView(@Nonnull String viewName) {
+        viewerMap.remove(viewName);
         final Iterator<Entry<String, String>> iterator = viewingMap.entrySet().iterator();
         // 关闭所有正在浏览该视图的玩家所打开的页面
         while (iterator.hasNext()) {
@@ -104,6 +109,9 @@ public class ViewGuideImpl implements ViewGuide, Listener {
             viewRedirect.remove(playerName);
         } else {
             Print.VIEW_GUIDE.debug("Player {} close view", playerName);
+            final String viewName = viewingMap.get(playerName);
+            final Set<String> viewers = viewerMap.computeIfAbsent(viewName, k -> new HashSet<>());
+            viewers.remove(playerName);
             viewingMap.remove(playerName);
             viewUsdMap.remove(playerName);
         }
@@ -141,6 +149,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         // 设置玩家正在浏览的视图
         Print.VIEW_GUIDE.debug("Player {} open page {}.{}", playerName, viewName, target);
         viewingMap.put(playerName, viewName);
+        viewerMap.computeIfAbsent(viewName, k -> new HashSet<>()).add(playerName);
         // 打开容器
         if (page.needRefresh()) {
             this.refreshPageTask(page);
@@ -291,11 +300,8 @@ public class ViewGuideImpl implements ViewGuide, Listener {
             homePage.markRefresh();
         }
         // 直接刷新正在浏览的玩家
-        for (Entry<String, String> entry : viewingMap.entrySet()) {
-            if (!viewName.equals(entry.getValue())) {
-                continue;
-            }
-            final Page usingPage = this.getUsingPage(entry.getKey());
+        for (String playerName : viewerMap.computeIfAbsent(viewName, k -> new HashSet<>())) {
+            final Page usingPage = this.getUsingPage(playerName);
             if (usingPage != null && this.targetEqual(target, usingPage.getTarget())) {
                 this.refreshPageTask(usingPage);
             }
@@ -337,6 +343,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         }
         // 清空视图
         viewMap.clear();
+        viewerMap.clear();
         // 取消所有刷新任务
         for (BukkitTask refreshTask : refreshTaskMap.values()) {
             refreshTask.cancel();
