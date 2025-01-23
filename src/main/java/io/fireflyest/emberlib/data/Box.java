@@ -24,6 +24,15 @@ public final class Box<T> {
     }
 
     /**
+     * 获取数据的字符串形式
+     * 
+     * @return 数据字符串
+     */
+    public String string() {
+        return value.toString();
+    }
+
+    /**
      * 更新数据
      * 
      * @param value 数据

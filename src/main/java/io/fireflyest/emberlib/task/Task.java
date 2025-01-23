@@ -2,8 +2,10 @@ package io.fireflyest.emberlib.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -19,22 +21,44 @@ public abstract class Task {
      */
     protected final List<Task> follows = new ArrayList<>();
 
-    protected final String targetName;
     protected final Bundle[] bundles;
 
     protected CommandSender sender;
+    protected OfflinePlayer offlinePlayer;
 
     /**
      * 构造任务
      * 
-     * @param targetName 执行对象名称
      * @param bundles 任务数据数组
      */
-    protected Task(@Nonnull String targetName, Bundle... bundles) {
-        this.targetName = targetName;
+    protected Task(Bundle... bundles) {
+        this.bundles = bundles;
+    }
+
+    /**
+     * 构造任务
+     * 
+     * @param uid 执行对象uid
+     * @param bundles 任务数据数组
+     */
+    protected Task(@Nonnull String uid, Bundle... bundles) {
         this.bundles = bundles;
 
-        this.sender = Bukkit.getPlayerExact(targetName);
+        offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uid));
+        sender = offlinePlayer.getPlayer();
+    }
+
+    /**
+     * 构造任务
+     * 
+     * @param uid 执行对象uid
+     * @param bundles 任务数据数组
+     */
+    protected Task(@Nonnull UUID uid, Bundle... bundles) {
+        this.bundles = bundles;
+
+        offlinePlayer = Bukkit.getOfflinePlayer(uid);
+        sender = offlinePlayer.getPlayer();    
     }
 
     /**
@@ -67,8 +91,8 @@ public abstract class Task {
      * 
      * @return 名称
      */
-    public String getTargetName() {
-        return targetName;
+    public String getPlayerName() {
+        return offlinePlayer.getName();
     }
 
     /**
