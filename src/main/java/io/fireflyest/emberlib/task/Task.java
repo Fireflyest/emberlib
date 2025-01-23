@@ -7,6 +7,8 @@ import javax.annotation.Nonnull;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import io.fireflyest.emberlib.util.TextUtils;
 
 /**
  * 任务
@@ -38,14 +40,24 @@ public abstract class Task {
     /**
      * 构造任务
      * 
-     * @param uid 执行对象uid
+     * @param playerId 执行对象id
      * @param bundles 任务数据数组
      */
-    protected Task(@Nonnull String uid, Bundle... bundles) {
+    protected Task(@Nonnull String playerId, Bundle... bundles) {
         this.bundles = bundles;
 
-        offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uid));
-        sender = offlinePlayer.getPlayer();
+        if (TextUtils.match(TextUtils.UUID_PATTERN, playerId)) {
+            offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(playerId));
+            sender = offlinePlayer.getPlayer();
+        } else {
+            // 向下兼容uid传playerName的情况
+            final Player player = Bukkit.getPlayer(playerId);
+            if (player != null) {
+                offlinePlayer = player;
+                sender = player;
+            }
+        }
+
     }
 
     /**

@@ -53,6 +53,12 @@ public final class TextUtils {
     public static final Pattern COMPLETE_PURE_TEXT = Pattern.compile("^[a-zA-Z0-9]+$");
 
     /**
+     * UUID格式
+     */
+    public static final Pattern UUID_PATTERN = Pattern.compile(
+        "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
+
+    /**
      * 用于获取对应变量
      */
     public interface VariableContainer {
