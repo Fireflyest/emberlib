@@ -101,9 +101,9 @@ public interface ViewGuide {
      * 刷新指定的界面，所有正在浏览的玩家都会收到刷新，没有在浏览的标记为需要刷新
      * 
      * @param viewName 界面名称
-     * @param target 页面
+     * @param targets 页面
      */
-    void refreshPages(@Nonnull String viewName, @Nonnull String target);
+    void refreshPages(@Nonnull String viewName, @Nonnull String... targets);
 
     /**
      * 更新玩家浏览界面中的某个按钮

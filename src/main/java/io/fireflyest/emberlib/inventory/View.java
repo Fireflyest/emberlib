@@ -1,5 +1,6 @@
 package io.fireflyest.emberlib.inventory;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -25,6 +26,15 @@ public abstract class View {
      */
     @Nullable
     public abstract Page getHomePage(@Nullable String target);
+
+    /**
+     * 获取所有target的首页
+     * 
+     * @return 首页集
+     */
+    public Collection<Page> getHomePages() {
+        return pagesMap.values();
+    }
 
     /**
      * 删除某个页面链表
