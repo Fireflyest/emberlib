@@ -1,6 +1,7 @@
 package io.fireflyest.emberlib.inventory.core;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
@@ -287,23 +288,31 @@ public class ViewGuideImpl implements ViewGuide, Listener {
     }
 
     @Override
-    public void refreshPages(@Nonnull String viewName, @Nonnull String target) {
+    public void refreshPages(@Nonnull String viewName, @Nonnull String... targets) {
         // 判断视图是否存在
         if (!viewMap.containsKey(viewName)) {
             Print.VIEW_GUIDE.warn("View {} does not exist.", viewName);
             return;
         }
         // 获取视图的首页，标记需要刷新，当有玩家打开时就触发刷新
-        Print.VIEW_GUIDE.debug("Pages {}.{} refresh", viewName, target);
-        final Page homePage = viewMap.get(viewName).getHomePage(target);
-        if (homePage != null) {
-            homePage.markRefresh();
-        }
-        // 直接刷新正在浏览的玩家
-        for (String playerName : viewerMap.computeIfAbsent(viewName, k -> new HashSet<>())) {
-            final Page usingPage = this.getUsingPage(playerName);
-            if (usingPage != null && this.targetEqual(target, usingPage.getTarget())) {
-                this.refreshPageTask(usingPage);
+        if (targets.length == 0) {
+            this.refreshView(viewName);
+        } else {
+            final Set<String> targetSet = new HashSet<>(Arrays.asList(targets));
+            Print.VIEW_GUIDE.debug("Pages {}.{} refresh", viewName, targets);
+            // 标记需要刷新
+            for (String target : targets) {
+                final Page homePage = viewMap.get(viewName).getHomePage(target);
+                if (homePage != null) {
+                    homePage.markRefresh();
+                }
+            }
+            // 刷新正在浏览的玩家
+            for (String playerName : viewerMap.computeIfAbsent(viewName, k -> new HashSet<>())) {
+                final Page usingPage = this.getUsingPage(playerName);
+                if (usingPage != null && targetSet.contains(usingPage.getTarget())) {
+                    this.refreshPageTask(usingPage);
+                }
             }
         }
     }
@@ -568,14 +577,22 @@ public class ViewGuideImpl implements ViewGuide, Listener {
     }
 
     /**
-     * 比较两个可为空的文本是否相等
+     * 刷新视图
      * 
-     * @param t1 文本1
-     * @param t2 文本2
-     * @return 是否相等
+     * @param viewName 视图名称
      */
-    private boolean targetEqual(@Nullable String t1, @Nullable String t2) {
-        return (t1 == null && t2 == null) || (t1 != null && t1.equals(t2));
+    private void refreshView(String viewName) {
+        // 不传入目标，刷新所有页面
+        for (Page homePage : viewMap.get(viewName).getHomePages()) {
+            homePage.markRefresh();
+        }
+        // 刷新正在浏览的玩家
+        for (String playerName : viewerMap.computeIfAbsent(viewName, k -> new HashSet<>())) {
+            final Page usingPage = this.getUsingPage(playerName);
+            if (usingPage != null) {
+                this.refreshPageTask(usingPage);
+            }
+        }
     }
 
     /**
