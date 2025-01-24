@@ -25,8 +25,9 @@ public abstract class Task {
 
     protected final Bundle[] bundles;
 
-    protected CommandSender sender;
+    protected UUID uid;
     protected OfflinePlayer offlinePlayer;
+    protected CommandSender sender;
 
     /**
      * 构造任务
@@ -47,12 +48,14 @@ public abstract class Task {
         this.bundles = bundles;
 
         if (TextUtils.match(TextUtils.UUID_PATTERN, playerId)) {
-            offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(playerId));
+            uid = UUID.fromString(playerId);
+            offlinePlayer = Bukkit.getOfflinePlayer(uid);
             sender = offlinePlayer.getPlayer();
         } else {
-            // 向下兼容uid传playerName的情况
+            // 向下兼容id传playerName的情况
             final Player player = Bukkit.getPlayer(playerId);
             if (player != null) {
+                uid = player.getUniqueId();
                 offlinePlayer = player;
                 sender = player;
             }
@@ -68,7 +71,7 @@ public abstract class Task {
      */
     protected Task(@Nonnull UUID uid, Bundle... bundles) {
         this.bundles = bundles;
-
+        this.uid = uid;
         offlinePlayer = Bukkit.getOfflinePlayer(uid);
         sender = offlinePlayer.getPlayer();    
     }
