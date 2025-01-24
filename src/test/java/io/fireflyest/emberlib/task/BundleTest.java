@@ -3,6 +3,8 @@ package io.fireflyest.emberlib.task;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.UUID;
+
 import org.junit.Test;
 
 /**
@@ -23,6 +25,13 @@ public class BundleTest {
         assertEquals(10000L, bundle.getNumber());
 
         assertNull(bundle.getString());
+    }
+
+    @Test
+    public void testUid() {
+        UUID uuid = UUID.nameUUIDFromBytes("Fireflyest".getBytes());
+        System.err.println(uuid);
+        
     }
 
 }
