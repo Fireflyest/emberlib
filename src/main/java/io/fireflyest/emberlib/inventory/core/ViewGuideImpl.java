@@ -121,7 +121,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
     @Override
     public void openView(@Nonnull Player player, 
                          @Nonnull String viewName, 
-                         @Nullable String target) {
+                         @Nullable Object target) {
         final String playerName = player.getName();
         final Deque<Page> backStack = 
             viewUsdMap.computeIfAbsent(playerName, k -> new ArrayDeque<>());
@@ -288,7 +288,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
     }
 
     @Override
-    public void refreshPages(@Nonnull String viewName, @Nonnull String... targets) {
+    public void refreshPages(@Nonnull String viewName, @Nonnull Object... targets) {
         // 判断视图是否存在
         if (!viewMap.containsKey(viewName)) {
             Print.VIEW_GUIDE.warn("View {} does not exist.", viewName);
@@ -298,10 +298,10 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         if (targets.length == 0) {
             this.refreshView(viewName);
         } else {
-            final Set<String> targetSet = new HashSet<>(Arrays.asList(targets));
+            final Set<Object> targetSet = new HashSet<>(Arrays.asList(targets));
             Print.VIEW_GUIDE.debug("Pages {}.{} refresh", viewName, targets);
             // 标记需要刷新
-            for (String target : targets) {
+            for (Object target : targets) {
                 final Page homePage = viewMap.get(viewName).getHomePage(target);
                 if (homePage != null) {
                     homePage.markRefresh();

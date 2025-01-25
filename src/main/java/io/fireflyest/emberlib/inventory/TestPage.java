@@ -3,9 +3,15 @@ package io.fireflyest.emberlib.inventory;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * 测试页面
+ * 
+ * @author Fireflyest
+ * @since 1.0
+ */
 public class TestPage extends Page {
 
-    protected TestPage(String target, int pageNumber, int size) {
+    protected TestPage(Object target, int pageNumber, int size) {
         super(target, pageNumber, size);
         this.title = "test";
     }

@@ -31,7 +31,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     /**
      * 页面所属名称
      */
-    protected final String target;
+    protected final Object target;
     
     /**
      * 当前页面页码
@@ -56,7 +56,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     /**
      * 标题
      */
-    protected String title = "Page";
+    protected String title = this.getClass().getSimpleName();
 
     /**
      * 下一页
@@ -85,7 +85,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      * @param pageNumber 页码
      * @param size 容器大小
      */
-    protected Page(@Nullable String target, int pageNumber, int size) {
+    protected Page(@Nullable Object target, int pageNumber, int size) {
         this.target = target;
         this.pageNumber = pageNumber;
         this.size = size;
@@ -100,7 +100,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      * @param pageNumber 页码
      * @param inventoryType 容器类型
      */
-    protected Page(@Nullable String target, int pageNumber, InventoryType inventoryType) {
+    protected Page(@Nullable Object target, int pageNumber, InventoryType inventoryType) {
         this.target = target;
         this.pageNumber = pageNumber;
         this.size = inventoryType.getDefaultSize();
@@ -109,12 +109,27 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     }
 
     /**
+     * 创建容器
+     * 
+     * @param title 标题
+     */
+    public void setup(String title) {
+        this.title = title;
+        this.refresh = 1;
+        if (inventoryType == InventoryType.CHEST) {
+            inventory = Bukkit.createInventory(this, size, title);
+        } else {
+            inventory = Bukkit.createInventory(this, inventoryType, title);
+        }
+    }
+
+    /**
      * 获取该页面的标签
      * 
      * @return 页面标签
      */
     @Nullable
-    public String getTarget() {
+    public Object getTarget() {
         return target;
     }
 
@@ -163,21 +178,6 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      */
     public void setPre(@Nullable Page pre) {
         this.pre = new WeakReference<>(pre);
-    }
-
-    /**
-     * 更新容器标题
-     * 
-     * @param title 标题
-     */
-    public void updateTitle(String title) {
-        this.title = title;
-        this.refresh = 1;
-        if (inventoryType == InventoryType.CHEST) {
-            inventory = Bukkit.createInventory(this, size, title);
-        } else {
-            inventory = Bukkit.createInventory(this, inventoryType, title);
-        }
     }
 
     /**
@@ -285,7 +285,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
     @Override
     public Inventory getInventory() {
         if (inventory == null) {
-            this.updateTitle(title);
+            this.setup(title);
         }
         return inventory;
     }
