@@ -17,7 +17,7 @@ public class Slot {
     /**
      * 容器操作对应的界面行为
      * 
-     * @see Action
+     * @see org.bukkit.event.inventory.InventoryAction
      */
     private Map<InventoryAction, ActionResult> viewActionMap = new EnumMap<>(InventoryAction.class);
 
