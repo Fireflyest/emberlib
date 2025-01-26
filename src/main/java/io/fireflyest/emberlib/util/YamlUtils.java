@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -18,6 +22,9 @@ import io.fireflyest.emberlib.Print;
 import io.fireflyest.emberlib.config.annotation.Entry;
 import io.fireflyest.emberlib.config.annotation.Yaml;
 import io.fireflyest.emberlib.data.Box;
+import io.fireflyest.emberlib.data.Pair;
+import io.fireflyest.emberlib.inventory.Slot;
+import io.fireflyest.emberlib.inventory.item.ItemBuilder;
 
 /**
  * 配置文件工具类
@@ -180,6 +187,55 @@ public final class YamlUtils {
         if (saveYamlFile) {
             saveYaml(plugin, yamlFile, yamlFileName);
         }
+    }
+
+    /**
+     * 加载物品
+     * 
+     * @param plugin 插件
+     * @param fileName 文件名
+     * @param itemMap 物品
+     */
+    protected Map<String, Pair<ItemBuilder, Slot>> loadItems(@Nonnull JavaPlugin plugin, 
+            @Nonnull String fileName) {
+        
+        final Map<String, Pair<ItemBuilder, Slot>> itemMap = new HashMap<>();
+        final FileConfiguration yamlFile = loadYaml(plugin, fileName);
+        for (String key : yamlFile.getKeys(false)) {
+            final String type = yamlFile.getString(key + ".type", "none");
+            final String material = yamlFile.getString(key + ".material", "STONE")
+                                            .replace(" ", "_");
+            final String name = yamlFile.getString(key + ".name", key);
+            final int amount = yamlFile.getInt(key + ".amount", 1);
+            final int model = yamlFile.getInt(key + ".model", -1);
+            final boolean colorful = yamlFile.getBoolean(key + ".colorful", false);
+            final List<String> lore = yamlFile.getStringList(key + ".lore");
+            final ItemBuilder itemBuilder = new ItemBuilder(material)
+                .name(name).amount(amount).model(model).colorful(colorful);
+            final Slot slot = new Slot();
+            switch (type) {
+                case "button":
+                    // int buttonAction = yamlFile.getInt(key + ".action", ButtonAction.ACTION_NONE);
+                    // String buttonValue = yamlFile.getString(key + ".value", "");
+                    // itemBuilder = new ButtonItemBuilder(material).action(buttonAction, buttonValue);
+                    break;
+                case "interact":
+                    // String triggerAction = yamlFile.getString(key + ".action", InteractAction.ACTION_COMMAND);
+                    // String triggerValue = yamlFile.getString(key + ".value", "");
+                    // String trigger = yamlFile.getString(key + ".trigger", InteractAction.TRIGGER_USE);
+                    // int cooldown = yamlFile.getInt(key + ".cooldown", 1);
+                    // int durability = yamlFile.getInt(key + ".durability", -1);
+                    // itemBuilder = new InteractItemBuilder(material).cooldown(cooldown).durability(durability).trigger(trigger, triggerAction, triggerValue);
+                    break;
+                default:
+                    break;
+            }
+            for (String line : lore) {
+                itemBuilder.lore(line);
+            }
+            itemMap.put(key, new Pair<>(itemBuilder, slot));
+        }
+        return itemMap;
     }
 
     /**

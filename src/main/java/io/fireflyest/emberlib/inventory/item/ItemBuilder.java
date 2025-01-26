@@ -123,9 +123,9 @@ public class ItemBuilder {
      * 
      * @return 本身
      */
-    public ItemBuilder colorful()  {
+    public ItemBuilder colorful(boolean colorful) {
         update = true;
-        this.colorful = true;
+        this.colorful = colorful;
         return this;
     }
 
