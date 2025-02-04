@@ -39,7 +39,7 @@ public class ItemBuilder {
     private static final String DISPLAY_NAME_KEY = YamlUtils.DATA_PATH + '.' + "display-name";
     private static final String LORE_KEY = YamlUtils.DATA_PATH + '.' + "lore";
 
-    protected Map<String, String> replaces = new HashMap<>();
+    protected Map<String, Object> replaces = new HashMap<>();
 
     protected boolean update = true;
 
@@ -80,7 +80,7 @@ public class ItemBuilder {
      * @param value 变量值
      * @return 本身
      */
-    public ItemBuilder replace(String key, String value) {
+    public ItemBuilder replace(String key, Object value) {
         update = true;
         replaces.put(key, value);
         return this;
@@ -97,7 +97,9 @@ public class ItemBuilder {
         this.displayName = displayName.replace("&", "§");
         if (replaces.size() > 0) {
             this.displayName = TextUtils.varReplace(
-                TextUtils.PERCENT_PATTERN, displayName, 1, 1, k -> replaces.getOrDefault(k, k));
+                TextUtils.PERCENT_PATTERN, 
+                displayName, 1, 1, 
+                k -> String.valueOf(replaces.getOrDefault(k, k)));
         }
         return this;
     }
@@ -113,7 +115,9 @@ public class ItemBuilder {
         lore = lore.replace("&", "§");
         if (replaces.size() > 0) {
             lore = TextUtils.varReplace(
-                TextUtils.PERCENT_PATTERN, lore, 1, 1, k -> replaces.getOrDefault(k, k));
+                TextUtils.PERCENT_PATTERN, 
+                lore, 1, 1, 
+                k -> String.valueOf(replaces.getOrDefault(k, k)));
         }
         this.lore.add(lore);
         return this;
