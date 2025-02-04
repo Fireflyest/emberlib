@@ -14,6 +14,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import io.fireflyest.emberlib.Print;
+import io.fireflyest.emberlib.data.Pair;
+import io.fireflyest.emberlib.inventory.item.ItemBuilder;
 
 /**
  * 一个页面节点
@@ -315,6 +317,17 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
         if (slot != null) {
             slotMap.put(index, slot);
         }
+    }
+
+    /**
+     * 设置槽位物品及其行为
+     * 
+     * @param index 位置
+     * @param pair 槽位展示的物品和操作行为
+     * @see #refreshPage()
+     */
+    protected void slot(int index, Pair<ItemBuilder, Slot> pair) {
+        this.slot(index, pair.first().build(), pair.second());
     }
 
     /**

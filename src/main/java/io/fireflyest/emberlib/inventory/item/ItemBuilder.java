@@ -13,10 +13,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.fireflyest.emberlib.message.text.TextData;
 import io.fireflyest.emberlib.message.text.TextJsonDeserializer;
+import io.fireflyest.emberlib.util.TextUtils;
 import io.fireflyest.emberlib.util.YamlUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,8 @@ public class ItemBuilder {
 
     private static final String DISPLAY_NAME_KEY = YamlUtils.DATA_PATH + '.' + "display-name";
     private static final String LORE_KEY = YamlUtils.DATA_PATH + '.' + "lore";
+
+    protected Map<String, String> replaces = new HashMap<>();
 
     protected boolean update = true;
 
@@ -70,6 +74,19 @@ public class ItemBuilder {
     }
 
     /**
+     * 文本变量
+     * 
+     * @param key 变量名
+     * @param value 变量值
+     * @return 本身
+     */
+    public ItemBuilder replace(String key, String value) {
+        update = true;
+        replaces.put(key, value);
+        return this;
+    }
+
+    /**
      * 命名
      * 
      * @param displayName 名称
@@ -78,6 +95,10 @@ public class ItemBuilder {
     public ItemBuilder name(@Nonnull String displayName) {
         update = true;
         this.displayName = displayName.replace("&", "§");
+        if (replaces.size() > 0) {
+            this.displayName = TextUtils.varReplace(
+                TextUtils.PERCENT_PATTERN, displayName, 1, 1, k -> replaces.getOrDefault(k, k));
+        }
         return this;
     }
 
@@ -89,7 +110,31 @@ public class ItemBuilder {
      */
     public ItemBuilder lore(@Nonnull String lore) {
         update = true;
-        this.lore.add(lore.replace("&", "§"));
+        lore = lore.replace("&", "§");
+        if (replaces.size() > 0) {
+            lore = TextUtils.varReplace(
+                TextUtils.PERCENT_PATTERN, lore, 1, 1, k -> replaces.getOrDefault(k, k));
+        }
+        this.lore.add(lore);
+        return this;
+    }
+
+    /**
+     * 物品lore
+     * 
+     * @param lore lore
+     * @param line 行数
+     * @return 本身
+     */
+    public ItemBuilder lore(@Nonnull String lore, int line) {
+        update = true;
+        if (line > 31) {
+            line = 31;
+        }
+        while (this.lore.size() <= line) {
+            this.lore.add("");
+        }
+        this.lore.set(line, lore.replace("&", "§"));
         return this;
     }
 
@@ -191,30 +236,8 @@ public class ItemBuilder {
         if (model != -1) {
             meta.setCustomModelData(model);
         }
-        item.setItemMeta(meta);
+        this.meta(meta);
         return item;
-    }
-
-    /**
-     * 自定义数据
-     * 
-     * @param meta 元数据
-     */
-    private void nbtData(ItemMeta meta) {
-        for (Map.Entry<NamespacedKey, Object> entry : nbt.entrySet()) {
-            final NamespacedKey key = entry.getKey();
-            final Object value = entry.getValue();
-            if (value instanceof String) {
-                meta.getPersistentDataContainer()
-                    .set(key, PersistentDataType.STRING, (String) value);
-            } else if (value instanceof Integer) {
-                meta.getPersistentDataContainer()
-                    .set(key, PersistentDataType.INTEGER, (Integer) value);
-            } else if (value instanceof Double) {
-                meta.getPersistentDataContainer()
-                    .set(key, PersistentDataType.DOUBLE, (Double) value);
-            }
-        }
     }
 
     /**
@@ -250,6 +273,37 @@ public class ItemBuilder {
         }
         metaYaml = StringUtils.replaceOnce(yamlContainer.saveToString(), "temp", "==");
         return YamlUtils.deserialize(metaYaml, meta.getClass());
+    }
+
+    /**
+     * 物品元数据
+     * 
+     * @param meta 元数据
+     */
+    protected void meta(@Nonnull ItemMeta meta) {
+        item.setItemMeta(meta);
+    }
+
+    /**
+     * 自定义数据
+     * 
+     * @param meta 元数据
+     */
+    private void nbtData(ItemMeta meta) {
+        for (Map.Entry<NamespacedKey, Object> entry : nbt.entrySet()) {
+            final NamespacedKey key = entry.getKey();
+            final Object value = entry.getValue();
+            if (value instanceof String) {
+                meta.getPersistentDataContainer()
+                    .set(key, PersistentDataType.STRING, (String) value);
+            } else if (value instanceof Integer) {
+                meta.getPersistentDataContainer()
+                    .set(key, PersistentDataType.INTEGER, (Integer) value);
+            } else if (value instanceof Double) {
+                meta.getPersistentDataContainer()
+                    .set(key, PersistentDataType.DOUBLE, (Double) value);
+            }
+        }
     }
 
 }
