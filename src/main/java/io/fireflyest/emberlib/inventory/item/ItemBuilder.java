@@ -95,31 +95,18 @@ public class ItemBuilder {
     public ItemBuilder name(@Nonnull String displayName) {
         update = true;
         this.displayName = displayName.replace("&", "§");
-        if (replaces.size() > 0) {
-            this.displayName = TextUtils.varReplace(
-                TextUtils.PERCENT_PATTERN, 
-                displayName, 1, 1, 
-                k -> String.valueOf(replaces.getOrDefault(k, k)));
-        }
         return this;
     }
 
     /**
      * 物品lore
      * 
-     * @param lore lore
+     * @param line lore
      * @return 本身
      */
-    public ItemBuilder lore(@Nonnull String lore) {
+    public ItemBuilder lore(@Nonnull String line) {
         update = true;
-        lore = lore.replace("&", "§");
-        if (replaces.size() > 0) {
-            lore = TextUtils.varReplace(
-                TextUtils.PERCENT_PATTERN, 
-                lore, 1, 1, 
-                k -> String.valueOf(replaces.getOrDefault(k, k)));
-        }
-        this.lore.add(lore);
+        this.lore.add(line.replace("&", "§"));
         return this;
     }
 
@@ -219,6 +206,19 @@ public class ItemBuilder {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) {
             return item;
+        }
+        if (!replaces.isEmpty()) {
+            displayName = TextUtils.varReplace(
+                TextUtils.PERCENT_PATTERN, 
+                displayName, 1, 1, 
+                k -> String.valueOf(replaces.getOrDefault(k, k)));
+            for (int i = 0; i < lore.size(); i++) {
+                lore.set(i, TextUtils.varReplace(
+                    TextUtils.PERCENT_PATTERN, 
+                    lore.get(i), 1, 1, 
+                    k -> String.valueOf(replaces.getOrDefault(k, k))
+                ));
+            }
         }
         if (displayName != null) {
             meta.setDisplayName(displayName);
