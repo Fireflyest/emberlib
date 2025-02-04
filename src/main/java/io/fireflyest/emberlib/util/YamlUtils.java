@@ -8,7 +8,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -16,6 +15,7 @@ import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import io.fireflyest.emberlib.Print;
@@ -23,6 +23,7 @@ import io.fireflyest.emberlib.config.annotation.Entry;
 import io.fireflyest.emberlib.config.annotation.Yaml;
 import io.fireflyest.emberlib.data.Box;
 import io.fireflyest.emberlib.data.Pair;
+import io.fireflyest.emberlib.inventory.ActionResult;
 import io.fireflyest.emberlib.inventory.Slot;
 import io.fireflyest.emberlib.inventory.item.ItemBuilder;
 
@@ -194,9 +195,8 @@ public final class YamlUtils {
      * 
      * @param plugin 插件
      * @param fileName 文件名
-     * @param itemMap 物品
      */
-    protected Map<String, Pair<ItemBuilder, Slot>> loadItems(@Nonnull JavaPlugin plugin, 
+    public static Map<String, Pair<ItemBuilder, Slot>> loadItems(@Nonnull JavaPlugin plugin, 
             @Nonnull String fileName) {
         
         final Map<String, Pair<ItemBuilder, Slot>> itemMap = new HashMap<>();
@@ -215,9 +215,9 @@ public final class YamlUtils {
             final Slot slot = new Slot();
             switch (type) {
                 case "button":
-                    // int buttonAction = yamlFile.getInt(key + ".action", ButtonAction.ACTION_NONE);
-                    // String buttonValue = yamlFile.getString(key + ".value", "");
-                    // itemBuilder = new ButtonItemBuilder(material).action(buttonAction, buttonValue);
+                    final int btAction = yamlFile.getInt(key + ".action", ActionResult.ACTION_NONE);
+                    final String btValue = yamlFile.getString(key + ".value", "");
+                    slot.result(InventoryAction.PICKUP_ALL, false, btAction, btValue);
                     break;
                 case "interact":
                     // String triggerAction = yamlFile.getString(key + ".action", InteractAction.ACTION_COMMAND);
