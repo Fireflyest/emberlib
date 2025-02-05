@@ -121,6 +121,15 @@ public final class ActionResult {
     }
 
     /**
+     * 添加一个操作
+     * 
+     * @param type 操作类型
+     */
+    public void addAction(int type) {
+        this.addAction(type, null);
+    }
+
+    /**
      * 获取操作列表
      * 
      * @return 操作列表
