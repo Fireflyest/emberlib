@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -31,6 +32,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.NumberConversions;
 import io.fireflyest.emberlib.Print;
+import io.fireflyest.emberlib.data.Pair;
 import io.fireflyest.emberlib.inventory.Page;
 import io.fireflyest.emberlib.inventory.ActionResult;
 import io.fireflyest.emberlib.inventory.View;
@@ -395,7 +397,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         final ItemStack currentItem = event.getCurrentItem();
         final ItemStack cursor = event.getCursor();
         final InventoryHolder holder = clickedInventory.getHolder();
-        ActionResult result = null;
+        ActionResult result = new ActionResult(false, ActionResult.ACTION_NONE);
         Page page = null;
         if (holder instanceof Page) {
             // 点击的是视图
@@ -418,7 +420,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         }
         
         if (page != null) {
-            if (result == null || !result.isAllow()) {
+            if (!result.isAllow()) {
                 event.setCancelled(true);
             }
             this.processResult(result, player, page);
@@ -459,13 +461,13 @@ public class ViewGuideImpl implements ViewGuide, Listener {
      * @param currentItem 物品
      * @return 处理结果
      */
-    @Nullable
+    @Nonnull
     private ActionResult processMove(@Nonnull Inventory inventory, 
                                      @Nonnull Player player,
                                      @Nonnull Page page,
                                      @Nonnull ItemStack currentItem) {
         final int maxStackSize = currentItem.getMaxStackSize();
-        ActionResult result = null;
+        ActionResult result = new ActionResult(false, ActionResult.ACTION_NONE);
         int slot = inventory.first(currentItem.getType());
         if (slot == -1 || inventory.getItem(slot).getAmount() >= maxStackSize
                         || !inventory.getItem(slot).isSimilar(currentItem)) {
@@ -498,7 +500,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
             public void run() {
                 slotSet.forEach(slot -> {
                     final ItemStack item = inventory.getItem(slot);
-                    ActionResult result = null;
+                    ActionResult result = new ActionResult(false, ActionResult.ACTION_NONE);
                     try {
                         result = page.dragIn(slot, player, item);
                     } catch (Exception e) {
@@ -521,58 +523,59 @@ public class ViewGuideImpl implements ViewGuide, Listener {
      * @param player 玩家
      * @param page 页面
      */
-    private void processResult(@Nullable ActionResult result, 
+    private void processResult(@Nonnull ActionResult result, 
                                @Nonnull Player player, 
                                @Nonnull Page page) {
-        if (result == null) {
-            return;
-        }
+
         final String playerName = player.getName();
         final Sound sound = result.getSound();
-        final String value = result.getValue();
         if (sound != null) {
             player.playSound(player.getLocation(), sound, 1F, 1F);
         }
-        switch (result.getType()) {
-            case ActionResult.ACTION_BACK:
-                this.back(player);
-                break;
-            case ActionResult.ACTION_REFRESH:
-                page.runTaskAsynchronously(plugin);
-                break;
-            case ActionResult.ACTION_CLOSE:
-                player.closeInventory();
-                break;
-            case ActionResult.ACTION_PAGE_NEXT:
-                this.nextPage(player);
-                break;
-            case ActionResult.ACTION_PAGE_PRE:
-                this.prePage(player);
-                break;
-            case ActionResult.ACTION_PAGE_JUMP:
-                this.jump(player, NumberConversions.toInt(value));
-                break;
-            case ActionResult.ACTION_PAGE_OPEN:
-                if (value != null && value.contains(".")) {
-                    final String view = value.substring(0, value.lastIndexOf("."));
-                    final String pageTarget = value.substring(value.lastIndexOf(".") + 1);
-                    this.openView(player, view, pageTarget);
-                }
-                break;
-            case ActionResult.ACTION_CONSOLE_COMMAND:
-                if (value != null && !"".equals(value)) {
-                    final String command = value.replace("%player%", playerName);
-                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
-                }
-                break;
-            case ActionResult.ACTION_PLAYER_COMMAND:
-                if (value != null && !"".equals(value)) {
-                    final String playerCommand = value.replace("%player%", playerName);
-                    player.performCommand(playerCommand);
-                }
-                break;
-            default:
-                break;
+        // 处理结果中的所有行为
+        for (Pair<Integer, String> action : result.getActions()) {
+            final String value = action.second();
+            switch (action.first()) {
+                case ActionResult.ACTION_BACK:
+                    this.back(player);
+                    break;
+                case ActionResult.ACTION_REFRESH:
+                    page.runTaskAsynchronously(plugin);
+                    break;
+                case ActionResult.ACTION_CLOSE:
+                    player.closeInventory();
+                    break;
+                case ActionResult.ACTION_PAGE_NEXT:
+                    this.nextPage(player);
+                    break;
+                case ActionResult.ACTION_PAGE_PRE:
+                    this.prePage(player);
+                    break;
+                case ActionResult.ACTION_PAGE_JUMP:
+                    this.jump(player, NumberConversions.toInt(value));
+                    break;
+                case ActionResult.ACTION_PAGE_OPEN:
+                    if (value != null && value.contains(".")) {
+                        final String view = value.substring(0, value.lastIndexOf("."));
+                        final String pageTarget = value.substring(value.lastIndexOf(".") + 1);
+                        this.openView(player, view, pageTarget);
+                    }
+                    break;
+                case ActionResult.ACTION_CONSOLE_COMMAND:
+                    if (StringUtils.isNotEmpty(value)) {
+                        final String command = value.replace("%player%", playerName);
+                        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+                    }
+                    break;
+                case ActionResult.ACTION_PLAYER_COMMAND:
+                    if (StringUtils.isNotEmpty(value)) {
+                        final String playerCommand = value.replace("%player%", playerName);
+                        player.performCommand(playerCommand);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
