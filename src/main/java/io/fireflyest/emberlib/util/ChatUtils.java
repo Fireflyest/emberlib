@@ -14,6 +14,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.md_5.bungee.api.chat.hover.content.Entity;
 import net.md_5.bungee.api.chat.hover.content.Item;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 /**
  * 聊天文本构建
@@ -90,6 +91,27 @@ public final class ChatUtils {
         // 点击事件
         if (command != null) {
             builder.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+        }
+        return builder.create();
+    }
+
+    /**
+     * 文本
+     * 
+     * @param text 文本
+     * @param command 点击执行的指令
+     * @param hover 悬浮显示的文本
+     * @return 文本组件
+     */
+    public static BaseComponent[] text(@Nonnull String text, 
+                                       @Nullable String command, 
+                                       @Nullable String hover) {
+        final ComponentBuilder builder = new ComponentBuilder(text);
+        if (command != null) {
+            builder.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+        }
+        if (hover != null) {
+            builder.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hover)));
         }
         return builder.create();
     }
