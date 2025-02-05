@@ -99,6 +99,15 @@ public class ItemBuilder {
     }
 
     /**
+     * 获取物品名称
+     * 
+     * @return 名称
+     */
+    public String getName() {
+        return displayName;
+    }
+
+    /**
      * 物品lore
      * 
      * @param line lore
