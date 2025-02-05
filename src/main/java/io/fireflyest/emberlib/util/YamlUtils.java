@@ -26,6 +26,7 @@ import io.fireflyest.emberlib.data.Pair;
 import io.fireflyest.emberlib.inventory.ActionResult;
 import io.fireflyest.emberlib.inventory.Slot;
 import io.fireflyest.emberlib.inventory.item.ItemBuilder;
+import io.fireflyest.emberlib.inventory.item.SkullItemBuilder;
 
 /**
  * 配置文件工具类
@@ -203,6 +204,7 @@ public final class YamlUtils {
         final FileConfiguration yamlFile = loadYaml(plugin, fileName);
         for (String key : yamlFile.getKeys(false)) {
             final String type = yamlFile.getString(key + ".type", "none");
+            final String meta = yamlFile.getString(key + ".meta", "none");
             final String material = yamlFile.getString(key + ".material", "STONE")
                                             .replace(" ", "_");
             final String name = yamlFile.getString(key + ".name", key);
@@ -210,10 +212,21 @@ public final class YamlUtils {
             final int model = yamlFile.getInt(key + ".model", -1);
             final boolean colorful = yamlFile.getBoolean(key + ".colorful", false);
             final List<String> lore = yamlFile.getStringList(key + ".lore");
-            final ItemBuilder itemBuilder = new ItemBuilder(material)
-                .name(name).amount(amount).model(model).colorful(colorful);
+            final ItemBuilder itemBuilder;
+            switch (meta) {
+                case "skull":
+                    itemBuilder = new SkullItemBuilder(material);
+                    break;
+                case "none":
+                default:
+                    itemBuilder = new ItemBuilder(material);
+                    break;
+            }
+            itemBuilder.name(name).amount(amount).model(model).colorful(colorful);
             final Slot slot = new Slot();
             switch (type) {
+                default:
+                case "none":
                 case "button":
                     final int btAction = yamlFile.getInt(key + ".action", ActionResult.ACTION_NONE);
                     final String btValue = yamlFile.getString(key + ".value", "");
@@ -226,8 +239,6 @@ public final class YamlUtils {
                     // int cooldown = yamlFile.getInt(key + ".cooldown", 1);
                     // int durability = yamlFile.getInt(key + ".durability", -1);
                     // itemBuilder = new InteractItemBuilder(material).cooldown(cooldown).durability(durability).trigger(trigger, triggerAction, triggerValue);
-                    break;
-                default:
                     break;
             }
             for (String line : lore) {
