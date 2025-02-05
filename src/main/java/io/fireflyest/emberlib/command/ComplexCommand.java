@@ -107,6 +107,18 @@ public abstract class ComplexCommand extends AbstractCommand
     }
 
     /**
+     * 添加子指令
+     * 
+     * @param name 子指令名称
+     * @param subCommand 子指令
+     * @return 本身
+     */
+    public ComplexCommand addSub(@Nonnull String name, @Nonnull SubCommand subCommand) {
+        this.subCommands.put(name, subCommand.name(name));
+        return this;
+    }
+
+    /**
      * 应用到插件
      * 
      * @param plugin 插件
