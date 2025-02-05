@@ -1,7 +1,10 @@
 package io.fireflyest.emberlib.inventory;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Sound;
+import io.fireflyest.emberlib.data.Pair;
 
 /**
  * 页面操作返回行为
@@ -72,8 +75,7 @@ public final class ActionResult {
     public static final int ACTION_UNKNOWN = -1;
 
     private final boolean allow;
-    private final int type;
-    private final String value;
+    private final List<Pair<Integer, String>> actions = new ArrayList<>(5);
 
     private Sound sound;
 
@@ -84,10 +86,9 @@ public final class ActionResult {
      * @param type 操作类型
      * @param value 返回值
      */
-    protected ActionResult(boolean allow, int type, @Nullable String value) {
+    public ActionResult(boolean allow, int type, @Nullable String value) {
         this.allow = allow;
-        this.type = type;
-        this.value = value;
+        this.actions.add(new Pair<>(type, value));
     }
 
     /**
@@ -96,7 +97,7 @@ public final class ActionResult {
      * @param allow 容器操作是允许否
      * @param type 操作类型
      */
-    protected ActionResult(boolean allow, int type) {
+    public ActionResult(boolean allow, int type) {
         this(allow, type, null);
     }
 
@@ -104,13 +105,8 @@ public final class ActionResult {
         return allow;
     }
 
-    public int getType() {
-        return type;
-    }
-
-    @Nullable
-    public String getValue() {
-        return value;
+    public List<Pair<Integer, String>> getActions() {
+        return actions;
     }
 
     @Nullable

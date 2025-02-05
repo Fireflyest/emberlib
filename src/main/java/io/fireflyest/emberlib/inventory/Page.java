@@ -230,7 +230,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      * @param cursor 指针上的物品
      * @return 事件处理结果
      */
-    @Nullable
+    @Nonnull
     public ActionResult action(int index, @Nonnull InventoryAction inventoryAction, 
             @Nonnull Player player, @Nullable ItemStack currentItem, @Nullable ItemStack cursor) {
         Print.VIEW_GUIDE.debug("Player {} {} on {} currentItem:{} cursor:{}", 
@@ -252,6 +252,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      * @param currentItem 物品
      * @return 事件处理结果
      */
+    @Nonnull
     public ActionResult moveIn(int index, @Nonnull Player player, @Nullable ItemStack currentItem) {
         Print.VIEW_GUIDE.debug("Player {} move item:{} on {}", 
             player.getName(), 
@@ -269,6 +270,7 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      * @see org.bukkit.event.inventory.InventoryDragEvent#getNewItems()
      * @return 事件处理结果
      */
+    @Nonnull
     public ActionResult dragIn(int index, @Nonnull Player player, @Nullable ItemStack item) {
         Print.VIEW_GUIDE.debug("Player {} drag item:{} on {}", 
             player.getName(), 

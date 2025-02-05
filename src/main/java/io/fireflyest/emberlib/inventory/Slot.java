@@ -74,9 +74,11 @@ public class Slot {
      * @param inventoryAction 容器操作
      * @return 界面行为
      */
-    @Nullable
+    @Nonnull
     public ActionResult getResult(@Nonnull InventoryAction inventoryAction) {
-        return viewActionMap.get(inventoryAction);
+        return viewActionMap.getOrDefault(
+            inventoryAction, 
+            new ActionResult(false, ActionResult.ACTION_UNKNOWN));
     }
 
 }
