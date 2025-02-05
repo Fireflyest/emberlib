@@ -101,10 +101,30 @@ public final class ActionResult {
         this(allow, type, null);
     }
 
+    /**
+     * 页面操作返回行为
+     * 
+     * @return 容器操作是允许否
+     */
     public boolean isAllow() {
         return allow;
     }
 
+    /**
+     * 添加一个操作
+     * 
+     * @param type 操作类型
+     * @param value 返回值
+     */
+    public void addAction(int type, String value) {
+        this.actions.add(new Pair<>(type, value));
+    }
+
+    /**
+     * 获取操作列表
+     * 
+     * @return 操作列表
+     */
     public List<Pair<Integer, String>> getActions() {
         return actions;
     }
