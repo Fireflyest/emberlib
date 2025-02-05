@@ -29,8 +29,16 @@ public class SkullItemBuilder extends ItemBuilder {
         this.player = player;
     }
 
-    public void setPlayer(@Nonnull OfflinePlayer player) {
+    /**
+     * 设置头颅玩家
+     * 
+     * @param player 玩家
+     * @return {@link SkullItemBuilder}
+     */
+    public SkullItemBuilder setPlayer(@Nonnull OfflinePlayer player) {
+        update = true;
         this.player = player;
+        return this;
     }
 
     @Override
