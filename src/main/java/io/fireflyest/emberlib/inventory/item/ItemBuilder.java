@@ -74,6 +74,18 @@ public class ItemBuilder {
     }
 
     /**
+     * 设置材料
+     * 
+     * @param material 材料
+     * @return 本身
+     */
+    public ItemBuilder material(@Nonnull Material material) {
+        update = true;
+        this.material = material;
+        return this;
+    }
+
+    /**
      * 文本变量
      * 
      * @param key 变量名
