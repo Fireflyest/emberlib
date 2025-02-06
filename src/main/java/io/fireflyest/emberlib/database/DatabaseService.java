@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.annotation.Nonnull;
+import io.fireflyest.emberlib.Print;
 import io.fireflyest.emberlib.database.annotation.Auto;
 import io.fireflyest.emberlib.database.annotation.Service;
 import io.fireflyest.emberlib.util.ReflectionUtils;
@@ -92,6 +93,7 @@ public abstract class DatabaseService {
         final Connection connection = DatabaseConnector.getConnect(url);
         // 执行指令
         try (Statement statement = connection.createStatement()) {
+            Print.EMBER_LIB.debug("Execute sql: {}", sql);
             statement.execute(sql);
         } catch (SQLException e) {
             e.printStackTrace();

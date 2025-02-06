@@ -58,6 +58,7 @@ public final class EmberLib extends JavaPlugin {
         server = this.getServer();
 
         Print.EMBER_LIB.info("Registering service of guide.");
+        Print.EMBER_LIB.onDebug();
         Print.VIEW_GUIDE.onDebug();
         guide = new ViewGuideImpl(this);
         server.getPluginManager().registerEvents(guide, this);
