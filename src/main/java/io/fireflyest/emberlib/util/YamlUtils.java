@@ -16,6 +16,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import io.fireflyest.emberlib.Print;
@@ -228,6 +229,7 @@ public final class YamlUtils {
                 default:
                 case "none":
                 case "button":
+                    itemBuilder.flags(ItemFlag.HIDE_ATTRIBUTES);
                     final int btAction = yamlFile.getInt(key + ".action", ActionResult.ACTION_NONE);
                     final String btValue = yamlFile.getString(key + ".value", "");
                     slot.result(InventoryAction.PICKUP_ALL, false, btAction, btValue);
