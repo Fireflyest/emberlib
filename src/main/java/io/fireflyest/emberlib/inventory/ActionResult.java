@@ -30,11 +30,6 @@ public final class ActionResult {
     public static final int ACTION_CLOSE = 2;
 
     /**
-     * 打开某个界面
-     */
-    public static final int ACTION_OPEN = 3;
-
-    /**
      * 刷新
      */
     public static final int ACTION_REFRESH = 3;
