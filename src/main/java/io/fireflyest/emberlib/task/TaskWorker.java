@@ -102,7 +102,7 @@ public class TaskWorker {
                 }
                 final Task task = taskQueue.poll();
                 if (task == null) {
-                    Print.EMBER_LIB.error("Task is null, Queue size: {0}", taskQueue.size());
+                    Print.EMBER_LIB.info("Task is null, Queue size: {0}", taskQueue.size());
                     continue;
                 }
                 taskName = task.getClass().getSimpleName();
