@@ -127,13 +127,13 @@ public abstract class ComplexCommand extends AbstractCommand
     public ComplexCommand apply(@Nonnull JavaPlugin plugin) {
         this.plugin = plugin;
         final PluginCommand command = plugin.getCommand(this.getName());
-        final String permission = command.getPermission();
-        if (permission != null) {
-            for (SubCommand subCommand : subCommands.values()) {
-                subCommand.permission(permission + "." + subCommand.getName());
-            }
-        }
         if (command != null) {
+            final String permission = command.getPermission();
+            if (permission != null) {
+                for (SubCommand subCommand : subCommands.values()) {
+                    subCommand.permission(permission + "." + subCommand.getName());
+                }
+            }
             command.setExecutor(this);
             command.setTabCompleter(this);
         }

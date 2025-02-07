@@ -54,7 +54,8 @@ public final class ChatUtils {
         final ComponentBuilder builder = new ComponentBuilder();
         final int amount = itemStack.getAmount();
         final String type = itemStack.getType().toString().toLowerCase();
-        final TranslatableComponent trans = new TranslatableComponent("item.minecraft." + type);
+        final String tl = (itemStack.getType().isBlock() ? "block" : "item") + ".minecraft." + type;
+        final TranslatableComponent trans = new TranslatableComponent(tl);
         final String tagString = CraftUtils.toTagString(itemStack);
         final Item item = new Item(MINECRAFT + type, amount, ItemTag.ofNbt(tagString));
         // 悬浮显示

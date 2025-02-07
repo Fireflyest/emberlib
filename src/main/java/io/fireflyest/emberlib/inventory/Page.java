@@ -23,7 +23,7 @@ import io.fireflyest.emberlib.inventory.item.ItemBuilder;
  * @author Fireflyest
  * @since 1.0
  */
-public abstract class Page extends BukkitRunnable implements InventoryHolder {
+public abstract class Page implements InventoryHolder {
 
     /**
      * 槽位，对应容器 {@link #inventory} 中的物品的操作属性
@@ -294,13 +294,13 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
         return inventory;
     }
 
-    @Override
-    public void run() {
-        this.refreshPage();
-        this.refresh = refreshInterval == -1 ? 0 : refresh - 1;
-        if (refresh <= 0) {
-            this.cancel();
-        }
+    /**
+     * 获取页面的刷新任务
+     * 
+     * @return 任务
+     */
+    public PageRunnable runnable() {
+        return new PageRunnable();
     }
 
     /**
@@ -341,6 +341,22 @@ public abstract class Page extends BukkitRunnable implements InventoryHolder {
      */
     protected void slot(int index, @Nullable ItemStack item) {
         this.slot(index, item, new Slot());
+    }
+
+    /**
+     * 刷新页面
+     */
+    public class PageRunnable extends BukkitRunnable {
+
+        @Override
+        public void run() {
+            Page.this.refreshPage();
+            refresh = refreshInterval == -1 ? 0 : refresh - 1;
+            if (refresh <= 0) {
+                this.cancel();
+            }
+        }
+
     }
 
 }

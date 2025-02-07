@@ -107,6 +107,9 @@ public class ViewGuideImpl implements ViewGuide, Listener {
 
     @Override
     public void closeView(@Nonnull String playerName) {
+        if (!viewingMap.containsKey(playerName)) {
+            return;
+        }
         if (viewRedirect.contains(playerName)) {
             Print.VIEW_GUIDE.debug("Player {} redirect view", playerName);
             viewRedirect.remove(playerName);
@@ -540,7 +543,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
                     this.back(player);
                     break;
                 case ActionResult.ACTION_REFRESH:
-                    page.runTaskAsynchronously(plugin);
+                    page.runnable().runTaskAsynchronously(plugin);
                     break;
                 case ActionResult.ACTION_CLOSE:
                     player.closeInventory();
@@ -610,9 +613,9 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         if (refreshTask == null || refreshTask.isCancelled()) {
             final int interval = page.getRefreshInterval();
             if (interval < 0) {
-                page.runTaskAsynchronously(plugin);
+                page.runnable().runTaskAsynchronously(plugin);
             } else {
-                refreshTask = page.runTaskTimerAsynchronously(plugin, 0, interval);
+                refreshTask = page.runnable().runTaskTimerAsynchronously(plugin, 0, interval);
                 refreshTaskMap.put(page, refreshTask);
             }
         }
