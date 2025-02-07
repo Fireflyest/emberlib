@@ -13,6 +13,8 @@ import io.fireflyest.emberlib.inventory.ViewGuide;
 import io.fireflyest.emberlib.inventory.core.ViewGuideImpl;
 import io.fireflyest.emberlib.message.Notification;
 import io.fireflyest.emberlib.message.NotificationImpl;
+import io.fireflyest.emberlib.task.TaskHandler;
+import io.fireflyest.emberlib.task.core.TaskHandlerImpl;
 import io.fireflyest.emberlib.util.ChatUtils;
 
 /**
@@ -23,6 +25,7 @@ public final class EmberLib extends JavaPlugin {
 
     private Server server;
     private ViewGuideImpl guide;
+    private TaskHandler handler;
 
     /**
      * 获取这个插件
@@ -49,6 +52,7 @@ public final class EmberLib extends JavaPlugin {
                     return;
                 }
                 ItemStack itemStack = Bukkit.getItemFactory().createItemStack("minecraft:diamond_sword{Enchantments:[{id:\"minecraft:sharpness\", lvl:3}]}");
+                player.sendMessage(itemStack.serialize().toString());
                 notification.sendOne(ChatUtils.textItemStack(itemStack, null), player);
 
                 notification.sendOne(ChatUtils.textEntity(player, null), player);
@@ -60,9 +64,16 @@ public final class EmberLib extends JavaPlugin {
         Print.EMBER_LIB.info("Registering service of guide.");
         Print.EMBER_LIB.onDebug();
         Print.VIEW_GUIDE.onDebug();
+
+        // 导航
         guide = new ViewGuideImpl(this);
         server.getPluginManager().registerEvents(guide, this);
-        server.getServicesManager().register(ViewGuide.class, guide, this, ServicePriority.Normal);
+        server.getServicesManager()
+            .register(ViewGuide.class, guide, this, ServicePriority.Normal);
+        // 任务
+        handler = new TaskHandlerImpl();
+        server.getServicesManager()
+            .register(TaskHandler.class, handler, this, ServicePriority.Normal);
 
         guide.addView("test", new TestView());
         if (player != null) {

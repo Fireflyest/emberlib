@@ -56,13 +56,23 @@ public final class CraftUtils {
     public static final String CRAFTBUKKIT = "org.bukkit.craftbukkit." + VERSION + '.';
 
     private static final Field STACK_HANDLE;
+    private static final Method AS_NMS_COPY;
+    private static final Method AS_CRAFT_COPY;
+    private static final Method MAKE_TAG;
+
     private static final Method GET_TAG_CLONE;
 
     static {
+        Class<?> mcStackClass = null;
+
         Field handle = null;
+        Method asNmsCopy = null;
+        Method asCraftCopy = null;
+        Method makeTag = null;
+
         Method getTagClone = null;
         try {
-            final Class<?> mcStackClass = Class.forName("net.minecraft.world.item.ItemStack");
+            mcStackClass = Class.forName("net.minecraft.world.item.ItemStack");
             if (mcStackClass != null) {
                 getTagClone = mcStackClass.getDeclaredMethod("getTagClone");
                 ReflectionUtils.makeAccessible(getTagClone);
@@ -75,11 +85,21 @@ public final class CraftUtils {
             if (craftStackClass != null) {
                 handle = craftStackClass.getDeclaredField("handle");
                 ReflectionUtils.makeAccessible(handle);
+                asNmsCopy = craftStackClass.getDeclaredMethod("asNMSCopy", ItemStack.class);
+                ReflectionUtils.makeAccessible(asNmsCopy);
+                asCraftCopy = craftStackClass.getDeclaredMethod("asCraftCopy", ItemStack.class);
+                ReflectionUtils.makeAccessible(asCraftCopy);
+                makeTag = craftStackClass.getDeclaredMethod("makeTag", mcStackClass);
+                ReflectionUtils.makeAccessible(makeTag);
             }
-        } catch (NoSuchFieldException e) {
+        } catch (NoSuchFieldException | NoSuchMethodException | SecurityException e) {
             //
         }
         STACK_HANDLE = handle;
+        AS_NMS_COPY = asNmsCopy;
+        AS_CRAFT_COPY = asCraftCopy;
+        MAKE_TAG = makeTag;
+
         GET_TAG_CLONE = getTagClone;
     }
 
@@ -111,13 +131,47 @@ public final class CraftUtils {
      * @return 物品处理
      */
     @Nullable
-    public static Object getCraftItemHandle(ItemStack item) {
+    public static Object getCraftItemHandle(@Nonnull Object item) {
         try {
             return STACK_HANDLE.get(item);
         } catch (IllegalArgumentException | IllegalAccessException e) {
-            e.printStackTrace();
+            // ignore
         }
         return null;
+    }
+
+    /**
+     * ItemStack转为nms
+     * 
+     * @param item 物品
+     * @return nms
+     */
+    @Nullable
+    public static Object asNmsCopy(@Nonnull ItemStack item) {
+        Object nms = null;
+        try {
+            nms = AS_NMS_COPY.invoke(null, item);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return nms;
+    }
+
+    /**
+     * ItemStack转为CraftItemStack
+     * 
+     * @param item 物品
+     * @return CraftItemStack
+     */
+    @Nullable
+    public static Object asCraftCopy(@Nonnull ItemStack item) {
+        Object craftItem = null;
+        try {
+            craftItem = AS_CRAFT_COPY.invoke(null, item);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return craftItem;
     }
 
     /**
@@ -127,9 +181,19 @@ public final class CraftUtils {
      * @return nbt
      */
     @Nullable
-    public static String toTagString(ItemStack item) {
+    public static String toTagString(@Nonnull ItemStack item) {
         String nbt = null;
-        final Object handle = getCraftItemHandle(item);
+        Object handle = getCraftItemHandle(item);
+        Object craftItem = null;
+        if (handle == null && (craftItem = asCraftCopy(item)) != null) {
+            handle = getCraftItemHandle(craftItem);
+            try {
+                MAKE_TAG.invoke(craftItem, handle);
+            } catch (IllegalAccessException | IllegalArgumentException 
+                    | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
         if (handle != null) {
             try {
                 final Object tag = GET_TAG_CLONE.invoke(handle);
