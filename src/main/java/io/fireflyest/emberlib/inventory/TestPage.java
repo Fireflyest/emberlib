@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
  */
 public class TestPage extends Page {
 
-    protected TestPage(Object target, int pageNumber, int size) {
+    protected TestPage(String target, int pageNumber, int size) {
         super(target, pageNumber, size);
         this.title = "test";
     }

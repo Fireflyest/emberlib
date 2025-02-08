@@ -40,7 +40,7 @@ public interface ViewGuide {
      * @param viewName 视图名称
      * @param target 页面标签
      */
-    void openView(@Nonnull Player player, @Nonnull String viewName, @Nullable Object target);
+    void openView(@Nonnull Player player, @Nonnull String viewName, @Nullable String target);
 
     /**
      * 获取某个玩家正在浏览的页面
@@ -103,7 +103,7 @@ public interface ViewGuide {
      * @param viewName 界面名称
      * @param targets 页面
      */
-    void refreshPages(@Nonnull String viewName, @Nonnull Object... targets);
+    void refreshPages(@Nonnull String viewName, @Nonnull String... targets);
 
     /**
      * 更新玩家浏览界面中的某个按钮
