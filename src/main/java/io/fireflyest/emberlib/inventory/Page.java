@@ -304,6 +304,14 @@ public abstract class Page implements InventoryHolder {
     }
 
     /**
+     * 清理容器
+     */
+    protected void clean() {
+        inventory.clear();
+        slotMap.clear();
+    }
+
+    /**
      * 设置槽位物品及其行为
      * 
      * @param index 位置
