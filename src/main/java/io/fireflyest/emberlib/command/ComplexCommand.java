@@ -70,14 +70,13 @@ public abstract class ComplexCommand extends AbstractCommand
                                       Command command, 
                                       String label, 
                                       String[] args) {
-        int index = args.length - 1;
+        final int index = args.length - 1;
         List<String> list = Collections.emptyList();
         SubCommand subCommand = null;
         if (index == 0) { // 复杂指令的子指令列表
             list = this.getArgumentTab(index, sender, args[index]);
         } else if ((subCommand = subCommands.get(args[0])) != null) { // 转由子指令提示
-            index--;
-            list = subCommand.getArgumentTab(index, sender, args[index]);
+            list = subCommand.getArgumentTab(index - 1, sender, args[index]);
         }
         return list;
     }
