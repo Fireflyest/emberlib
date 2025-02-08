@@ -303,10 +303,10 @@ public class ViewGuideImpl implements ViewGuide, Listener {
         if (targets.length == 0) {
             this.refreshView(viewName);
         } else {
-            final Set<Object> targetSet = new HashSet<>(Arrays.asList(targets));
+            final Set<String> targetSet = new HashSet<>(Arrays.asList(targets));
             Print.VIEW_GUIDE.debug("Pages {}.{} refresh", viewName, targets);
             // 标记需要刷新
-            for (Object target : targets) {
+            for (String target : targets) {
                 final Page homePage = viewMap.get(viewName).getHomePage(target);
                 if (homePage != null) {
                     homePage.markRefresh();
