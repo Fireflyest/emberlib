@@ -184,20 +184,13 @@ public final class CraftUtils {
     public static String toTagString(@Nonnull ItemStack item) {
         String nbt = null;
         Object handle = getCraftItemHandle(item);
-        Object craftItem = null;
-        if (handle == null && (craftItem = asCraftCopy(item)) != null) {
-            handle = getCraftItemHandle(craftItem);
-            try {
-                MAKE_TAG.invoke(craftItem, handle);
-            } catch (IllegalAccessException | IllegalArgumentException 
-                    | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+        if (handle == null) {
+            handle = asNmsCopy(item);
         }
         if (handle != null) {
             try {
                 final Object tag = GET_TAG_CLONE.invoke(handle);
-                nbt = tag.toString();
+                nbt = tag == null ? "{}" : tag.toString();
             } catch (IllegalAccessException | IllegalArgumentException 
                     | InvocationTargetException e) {
                 e.printStackTrace();
