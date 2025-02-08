@@ -33,7 +33,7 @@ public abstract class Page implements InventoryHolder {
     /**
      * 页面所属名称
      */
-    protected final Object target;
+    protected final String target;
     
     /**
      * 当前页面页码
@@ -87,7 +87,7 @@ public abstract class Page implements InventoryHolder {
      * @param pageNumber 页码
      * @param size 容器大小
      */
-    protected Page(@Nullable Object target, int pageNumber, int size) {
+    protected Page(@Nullable String target, int pageNumber, int size) {
         this.target = target;
         this.pageNumber = pageNumber;
         this.size = size;
@@ -102,7 +102,7 @@ public abstract class Page implements InventoryHolder {
      * @param pageNumber 页码
      * @param inventoryType 容器类型
      */
-    protected Page(@Nullable Object target, int pageNumber, InventoryType inventoryType) {
+    protected Page(@Nullable String target, int pageNumber, InventoryType inventoryType) {
         this.target = target;
         this.pageNumber = pageNumber;
         this.size = inventoryType.getDefaultSize();
@@ -131,7 +131,7 @@ public abstract class Page implements InventoryHolder {
      * @return 页面标签
      */
     @Nullable
-    public Object getTarget() {
+    public String getTarget() {
         return target;
     }
 

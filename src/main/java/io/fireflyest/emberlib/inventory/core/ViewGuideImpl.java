@@ -126,7 +126,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
     @Override
     public void openView(@Nonnull Player player, 
                          @Nonnull String viewName, 
-                         @Nullable Object target) {
+                         @Nullable String target) {
         final String playerName = player.getName();
         final Deque<Page> backStack = 
             viewUsdMap.computeIfAbsent(playerName, k -> new ArrayDeque<>());
@@ -293,7 +293,7 @@ public class ViewGuideImpl implements ViewGuide, Listener {
     }
 
     @Override
-    public void refreshPages(@Nonnull String viewName, @Nonnull Object... targets) {
+    public void refreshPages(@Nonnull String viewName, @Nonnull String... targets) {
         // 判断视图是否存在
         if (!viewMap.containsKey(viewName)) {
             Print.VIEW_GUIDE.warn("View {} does not exist.", viewName);
