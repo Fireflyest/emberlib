@@ -54,12 +54,19 @@ public final class ChatUtils {
         final ComponentBuilder builder = new ComponentBuilder();
         final int amount = itemStack.getAmount();
         final String type = itemStack.getType().toString().toLowerCase();
-        final String tl = (itemStack.getType().isBlock() ? "block" : "item") + ".minecraft." + type;
-        final TranslatableComponent trans = new TranslatableComponent(tl);
+        final String name = ItemUtils.getDisplayName(itemStack);
         final String tagString = CraftUtils.toTagString(itemStack);
         final Item item = new Item(MINECRAFT + type, amount, ItemTag.ofNbt(tagString));
+        if (StringUtils.isEmpty(name)) {
+            final String translatable = 
+                (itemStack.getType().isBlock() ? "block" : "item") + ".minecraft." + type;
+            final TranslatableComponent trans = new TranslatableComponent(translatable);
+            builder.append(trans);
+        } else {
+            builder.append(name);
+        }
         // 悬浮显示
-        builder.append(trans).event(new HoverEvent(HoverEvent.Action.SHOW_ITEM, item));
+        builder.event(new HoverEvent(HoverEvent.Action.SHOW_ITEM, item));
         // 点击事件
         if (command != null) {
             builder.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
