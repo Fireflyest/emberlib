@@ -69,6 +69,27 @@ public class Slot {
     }
 
     /**
+     * 指定某容器操作所执行的界面行为按钮行为
+     * 
+     * @param type 返回结果类型
+     * @param value 返回结果值
+     * @return 本身
+     */
+    public Slot button(int type, @Nonnull String value) {
+        return this.result(InventoryAction.PICKUP_ALL, false, type, value);
+    }
+
+    /**
+     * 指定某容器操作所执行的界面行为按钮行为
+     * 
+     * @param type 返回结果类型
+     * @return 本身
+     */
+    public Slot button(int type) {
+        return this.result(InventoryAction.PICKUP_ALL, false, type);
+    }
+
+    /**
      * 获取容器操作所执行的界面行为
      * 
      * @param inventoryAction 容器操作
