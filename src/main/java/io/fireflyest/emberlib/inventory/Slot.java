@@ -14,6 +14,9 @@ import org.bukkit.event.inventory.InventoryAction;
  */
 public class Slot {
 
+    private static final ActionResult DEFAULT = 
+        new ActionResult(false, ActionResult.ACTION_UNKNOWN);
+
     /**
      * 容器操作对应的界面行为
      * 
@@ -90,6 +93,27 @@ public class Slot {
     }
 
     /**
+     * 指定某容器操作所执行的界面行为交换行为
+     * 
+     * @param type 返回结果类型
+     * @param value 返回结果值
+     * @return 本身
+     */
+    public Slot swap(int type, @Nonnull String value) {
+        return this.result(InventoryAction.SWAP_WITH_CURSOR, true, type, value);
+    }
+
+    /**
+     * 指定某容器操作所执行的界面行为交换行为
+     * 
+     * @param type 返回结果类型
+     * @return 本身
+     */
+    public Slot swap(int type) {
+        return this.result(InventoryAction.SWAP_WITH_CURSOR, true, type);
+    }
+
+    /**
      * 获取容器操作所执行的界面行为
      * 
      * @param inventoryAction 容器操作
@@ -97,9 +121,7 @@ public class Slot {
      */
     @Nonnull
     public ActionResult getResult(@Nonnull InventoryAction inventoryAction) {
-        return viewActionMap.getOrDefault(
-            inventoryAction, 
-            new ActionResult(false, ActionResult.ACTION_UNKNOWN));
+        return viewActionMap.getOrDefault(inventoryAction, DEFAULT);
     }
 
 }
