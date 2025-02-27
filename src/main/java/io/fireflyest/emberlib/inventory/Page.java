@@ -81,6 +81,11 @@ public abstract class Page implements InventoryHolder {
     protected int refreshInterval = -1;
 
     /**
+     * 初始化按钮
+     */
+    protected boolean init = false;
+
+    /**
      * 一个页面节点
      * 
      * @param target 页面所属
@@ -285,6 +290,17 @@ public abstract class Page implements InventoryHolder {
      * @see #run()
      */
     public abstract void refreshPage();
+
+    /**
+     * 初始化页面，用来放置 {@link #slot(int, ItemStack, Slot)} 不用刷新的按钮
+     * 
+     * @see #refreshPage()
+     */
+    public void initPage() {
+        if (!init) {
+            init = true;
+        }
+    }
 
     @Override
     public Inventory getInventory() {
