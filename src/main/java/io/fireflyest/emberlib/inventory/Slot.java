@@ -93,6 +93,27 @@ public class Slot {
     }
 
     /**
+     * 指定某容器操作所执行的界面行为shift+按钮行为
+     * 
+     * @param type 返回结果类型
+     * @param value 返回结果值
+     * @return 本身
+     */
+    public Slot shiftButton(int type, @Nonnull String value) {
+        return this.result(InventoryAction.MOVE_TO_OTHER_INVENTORY, false, type, value);
+    }
+
+    /**
+     * 指定某容器操作所执行的界面行为shift+按钮行为
+     * 
+     * @param type 返回结果类型
+     * @return 本身
+     */
+    public Slot shiftButton(int type) {
+        return this.result(InventoryAction.MOVE_TO_OTHER_INVENTORY, false, type);
+    }
+
+    /**
      * 指定某容器操作所执行的界面行为交换行为
      * 
      * @param type 返回结果类型

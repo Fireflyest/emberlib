@@ -297,9 +297,7 @@ public abstract class Page implements InventoryHolder {
      * @see #refreshPage()
      */
     public void initPage() {
-        if (!init) {
-            init = true;
-        }
+        init = true;
     }
 
     @Override
