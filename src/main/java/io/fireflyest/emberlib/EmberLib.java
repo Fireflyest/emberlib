@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import io.fireflyest.emberlib.inventory.TestView;
 import io.fireflyest.emberlib.inventory.ViewGuide;
 import io.fireflyest.emberlib.inventory.core.ViewGuideImpl;
