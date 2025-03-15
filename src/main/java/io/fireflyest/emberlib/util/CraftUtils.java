@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bukkit.inventory.ItemStack;
+import io.fireflyest.emberlib.Print;
 
 /**
  * 服务端核心
@@ -36,10 +37,8 @@ public final class CraftUtils {
                 }
             }
         }
-        if (found == null) {
-            throw new IllegalArgumentException("Failed to parse server version.");
-        }
-        VERSION = found;
+        // 如果没有找到，可能是paper端
+        VERSION = found == null ? "v1_0_R0" : found;
     }
 
     /**
@@ -53,12 +52,11 @@ public final class CraftUtils {
     /**
      * 类路径
      */
-    public static final String CRAFTBUKKIT = "org.bukkit.craftbukkit." + VERSION + '.';
+    public static final String SPIGOT_CRAFTBUKKIT_PATH = "org.bukkit.craftbukkit." + VERSION + '.';
 
     private static final Field STACK_HANDLE;
     private static final Method AS_NMS_COPY;
     private static final Method AS_CRAFT_COPY;
-    private static final Method MAKE_TAG;
 
     private static final Method GET_TAG_CLONE;
 
@@ -68,10 +66,10 @@ public final class CraftUtils {
         Field handle = null;
         Method asNmsCopy = null;
         Method asCraftCopy = null;
-        Method makeTag = null;
 
         Method getTagClone = null;
         try {
+            // 获取物品nbt
             mcStackClass = Class.forName("net.minecraft.world.item.ItemStack");
             if (mcStackClass != null) {
                 getTagClone = mcStackClass.getDeclaredMethod("getTagClone");
@@ -89,8 +87,6 @@ public final class CraftUtils {
                 ReflectionUtils.makeAccessible(asNmsCopy);
                 asCraftCopy = craftStackClass.getDeclaredMethod("asCraftCopy", ItemStack.class);
                 ReflectionUtils.makeAccessible(asCraftCopy);
-                makeTag = craftStackClass.getDeclaredMethod("makeTag", mcStackClass);
-                ReflectionUtils.makeAccessible(makeTag);
             }
         } catch (NoSuchFieldException | NoSuchMethodException | SecurityException e) {
             //
@@ -98,7 +94,6 @@ public final class CraftUtils {
         STACK_HANDLE = handle;
         AS_NMS_COPY = asNmsCopy;
         AS_CRAFT_COPY = asCraftCopy;
-        MAKE_TAG = makeTag;
 
         GET_TAG_CLONE = getTagClone;
     }
@@ -116,11 +111,11 @@ public final class CraftUtils {
     @Nullable
     public static Class<?> getCraftClass(@Nonnull String name) {
         try {
-            return Class.forName(CRAFTBUKKIT + name);
+            return Class.forName(SPIGOT_CRAFTBUKKIT_PATH + name);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            Print.EMBER_LIB.debug("Craft class not found: " + name);
         }
+        return null;
     }
 
     /**
@@ -133,7 +128,9 @@ public final class CraftUtils {
     @Nullable
     public static Object getCraftItemHandle(@Nonnull Object item) {
         try {
-            return STACK_HANDLE.get(item);
+            if (STACK_HANDLE != null) {
+                return STACK_HANDLE.get(item);
+            }
         } catch (IllegalArgumentException | IllegalAccessException e) {
             // ignore
         }
@@ -150,7 +147,9 @@ public final class CraftUtils {
     public static Object asNmsCopy(@Nonnull ItemStack item) {
         Object nms = null;
         try {
-            nms = AS_NMS_COPY.invoke(null, item);
+            if (AS_NMS_COPY != null) {
+                nms = AS_NMS_COPY.invoke(null, item);
+            }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -167,7 +166,9 @@ public final class CraftUtils {
     public static Object asCraftCopy(@Nonnull ItemStack item) {
         Object craftItem = null;
         try {
-            craftItem = AS_CRAFT_COPY.invoke(null, item);
+            if (AS_CRAFT_COPY != null) {
+                craftItem = AS_CRAFT_COPY.invoke(null, item);
+            }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -182,15 +183,17 @@ public final class CraftUtils {
      */
     @Nullable
     public static String toTagString(@Nonnull ItemStack item) {
-        String nbt = null;
+        String nbt = "{}";
         Object handle = getCraftItemHandle(item);
         if (handle == null) {
             handle = asNmsCopy(item);
         }
-        if (handle != null) {
+        if (handle != null && GET_TAG_CLONE != null) {
             try {
                 final Object tag = GET_TAG_CLONE.invoke(handle);
-                nbt = tag == null ? "{}" : tag.toString();
+                if (tag != null) {
+                    nbt = tag.toString();
+                }
             } catch (IllegalAccessException | IllegalArgumentException 
                     | InvocationTargetException e) {
                 e.printStackTrace();
